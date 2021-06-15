@@ -1,5 +1,5 @@
 <template>
-  <base-layout page-title="All Memories">
+  <base-layout page-title="Class List">
     <template v-slot:actions-end>
       <ion-button router-link="/memories/add">
         <ion-icon slot="icon-only" :icon="add"></ion-icon>
