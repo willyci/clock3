@@ -1,6 +1,6 @@
 <template>
   <base-layout
-    :page-title="loadedMemory ? loadedMemory.title : 'Loading...'"
+    :page-title="loadedMemory ? loadedMemory.title : 'Loading..111'"
     page-default-back-link="/memories"
   >
     <h2 v-if="!loadedMemory">Could not find a memory for the given id.</h2>
