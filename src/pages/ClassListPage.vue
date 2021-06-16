@@ -1,7 +1,17 @@
 <template>
     <base-layout page-title="Class Schedule">    
-    <h1>Today</h1>
-    <h2>{{currentDate}}</h2>
+    <ion-grid>
+            <ion-row>
+                <ion-col size="6">
+                    <h1>Today</h1>  
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col size="12">
+                    <h2>{{currentDate}}</h2>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
     <ion-list>
         <ion-item 
             v-for="cuClass in classes" 
@@ -10,7 +20,7 @@
             >
             {{cuClass.ClassTitle}} - start at {{cuClass.timeIn}}
             <!--<ion-button @click="router.push('/submitTime'+cuClass.classID, cuClass)">NEXT</ion-button>-->
-   
+            
             <ion-icon :icon="chevronForward" size="small" slot="end"></ion-icon></ion-item>
     </ion-list>
     </base-layout>

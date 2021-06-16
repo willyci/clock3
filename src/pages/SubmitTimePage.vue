@@ -3,13 +3,43 @@
     page-title="Student Attendance"
     page-default-back-link="/"
   >
-    <h2>{{currentDate}}</h2>
+        <ion-grid>
+            <ion-row>
+                <ion-col size="12">
+                    <h1>class id : {{classID}}</h1>  
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col size="12">
+                    <h1>{{currentDate}}</h1>  
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col size="12">
+                    <h2>(9:00AM - 10:00AM)</h2>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    
     <h2>.{{cuClass}}.</h2>
-    <h2>Time In</h2>
-        <input type="text" value="9:00AM" />
-        <h2>Time Out</h2>
-        <input type="text" value="10:00AM" /><br/>
-        <button>Submit</button>
+    
+        
+        <!--<ion-item disabled="true">-->
+        <ion-item>    
+            <ion-label>Time In</ion-label>    
+            <ion-datetime display-format="h:mm A" minute-values="0,10,20,30,40,50" value="1990-02-19T09:00"></ion-datetime>
+        </ion-item>
+        <ion-item>      
+            <ion-label>Time Out</ion-label>    
+            <ion-datetime display-format="h:mm A" minute-values="0,10,20,30,40,50" value="1990-02-19T10:00"></ion-datetime>
+        </ion-item>
+        <ion-grid>
+            <ion-row>
+            <ion-col size="12">
+                <ion-button expand="full">Submit</ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
   </base-layout>
 </template>
 
