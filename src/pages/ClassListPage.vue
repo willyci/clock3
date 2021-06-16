@@ -26,12 +26,7 @@ export default {
     },
     data() {
         return {
-            classes:[
-                {id:1, classID:'1234', ClassTitle:'Med class 1234',date:'Mon May 24, 2021', timeIn:'9:00 AM', timeOut:'10:00AM'},
-                {id:2, classID:'534', ClassTitle:'History class 534',date:'Mon May 24, 2021', timeIn:'11:00 AM', timeOut:'12:00PM'},                
-                {id:3, classID:'134', ClassTitle:'Physics class 134',date:'Mon May 24, 2021', timeIn:'2:00 PM', timeOut:'3:00PM'},                
-                {id:4, classID:'341', ClassTitle:'Math class 341',date:'Mon May 24, 2021', timeIn:'4:00 PM', timeOut:'5:00PM'}
-            ],
+            classes:[],
             currentDate : '',
             chevronForward,
             msg:'hi'
@@ -59,12 +54,14 @@ export default {
         },
 
         getClass(){
-
+            fetch("https://flexcode.org/classes.json")
+            .then(response => response.json())
+            .then(data => (this.classes = data));
         }
     },
     mounted: function () {
       //update table display onload
-      //this.classes = this.getClass();
+      this.getClass();
       this.currentDate =this.getTodayDate();
       console.log("today is = "+this.currentDate);
   }
