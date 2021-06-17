@@ -71,6 +71,9 @@ export default {
                 this.userID = data.id;
 
             });
+
+            //this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
+            this.$store.dispatch('addUserName',this.userName);
         }
     },
     mounted: function () {

@@ -6,7 +6,7 @@
         <ion-grid>
             <ion-row>
                 <ion-col size="12">
-                    <h1>class id : {{classID}}</h1>  
+                    <h1>class id : {{classID}} {{ClassTitle}}.</h1>  
                 </ion-col>
             </ion-row>
             <ion-row>
@@ -21,7 +21,6 @@
             </ion-row>
         </ion-grid>
     
-    <h2>.{{cuClass}}.</h2>
     
         
         <!--<ion-item disabled="true">-->
@@ -53,11 +52,16 @@ export default {
   data() {
     return {
       currentDate: '',
-      classID : '',
-      gotit:''
-      
+      classID : this.$route.params.id,
+      gotit:'',
+      ClassTitle:'',
+      userName:''
     };
   },
+    computed:{
+        
+    },
+
   methods:{
         getTodayDate(){
             var today = new Date();
@@ -66,6 +70,10 @@ export default {
             var yyyy = today.getFullYear();
             today = mm + '/' + dd + '/' + yyyy;
             return today;
+        },
+        getClassTitle(){
+            this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
+            this.userName = this.$store.getters.username;
         }
     },
     mounted: function () {
@@ -74,6 +82,7 @@ export default {
       this.currentDate =this.getTodayDate();//  mm + '/' + dd + '/' + yyyy;   
       this.classID = this.$route.params.id;
       console.log("today is = "+this.currentDate);
+      this.getClassTitle();
     },
 };
 </script>
