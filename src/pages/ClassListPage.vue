@@ -2,8 +2,8 @@
     <base-layout page-title="Class Schedule">    
     <ion-grid>
             <ion-row>
-                <ion-col size="6">
-                    <h1>Today</h1>  
+                <ion-col size="12">
+                    <h1>Today for {{userName}}</h1>  
                 </ion-col>
             </ion-row>
             <ion-row>
@@ -39,7 +39,10 @@ export default {
             classes:[],
             currentDate : '',
             chevronForward,
-            msg:'hi'
+            msg:'hi',
+            userName: '',
+            userRole:'',
+            userID:''
         }
     },
     methods:{
@@ -55,18 +58,19 @@ export default {
             hours = hours % 12;
             hours = hours ? hours : 12; // the hour '0' should be '12'
             minutes = minutes < 10 ? '0'+minutes : minutes;
-            today = mm + '/' + dd + '/' + yyyy + ' -- ' + hours + ':' + minutes + ' ' + ampm;
-
-
-
-            
+            today = mm + '/' + dd + '/' + yyyy + ' -- ' + hours + ':' + minutes + ' ' + ampm;            
             return today;
         },
 
         getClass(){
             fetch("https://flexcode.org/classes.json")
             .then(response => response.json())
-            .then(data => (this.classes = data));
+            .then(data => {this.classes = data.classes;
+                this.userRole = data.role;
+                this.userName = data.name;
+                this.userID = data.id;
+
+            });
         }
     },
     mounted: function () {
