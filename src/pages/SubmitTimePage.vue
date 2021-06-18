@@ -21,6 +21,7 @@
             </ion-row>
         </ion-grid>
     
+    <h2>.{{userName}}</h2>
     
         
         <!--<ion-item disabled="true">-->

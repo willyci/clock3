@@ -22,11 +22,309 @@ const store = createStore({
                     description: 'Really tasty!',
                 },
             ],
-            classes: [
-                { id: 1, classID: '154', ClassTitle: 'Med class 154', date: 'Mon May 24, 2021', timeIn: '9:00 AM', timeOut: '10:00AM' },
-                { id: 2, classID: '534', ClassTitle: 'History class 534', date: 'Mon May 24, 2021', timeIn: '11:00 AM', timeOut: '12:00PM' },
-                { id: 3, classID: '134', ClassTitle: 'Physics class 134', date: 'Mon May 24, 2021', timeIn: '2:00 PM', timeOut: '3:00PM' },
-                { id: 4, classID: '341', ClassTitle: 'Math class 341', date: 'Mon May 24, 2021', timeIn: '4:00 PM', timeOut: '5:00PM' }
+            classes: [{
+                    "id": 1,
+                    "classID": "154",
+                    "ClassTitle": "Med class 154",
+                    "date": "Fri Jun 18, 2021",
+                    "studentTimeCheckIn": "2021-06-18T09:05",
+                    "studentTimeCheckOut": "2021-06-18T10:00",
+                    "classStartTime": "09:00AM",
+                    "classEndTime": "10:00AM",
+                    "students": [{
+                            "studentID": "001",
+                            "studentFirstName": "John",
+                            "studentLastName": "Smith",
+                            "studentTimeCheckIn": "1990-02-19T09:00",
+                            "studentTimeCheckOut": "2021-06-18T10:01",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "002",
+                            "studentFirstName": "Jen",
+                            "studentLastName": "Adrianne",
+                            "studentTimeCheckIn": "2021-06-18T08:55",
+                            "studentTimeCheckOut": "2021-06-18T10:03",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "003",
+                            "studentFirstName": "Halicki",
+                            "studentLastName": "Kennedy",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "004",
+                            "studentFirstName": "Estwick",
+                            "studentLastName": "Cathy",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        },
+                        {
+                            "studentID": "005",
+                            "studentFirstName": "John2",
+                            "studentLastName": "Smith2",
+                            "studentTimeCheckIn": "09:05AM",
+                            "studentTimeCheckOut": "10:01AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "006",
+                            "studentFirstName": "Jen2",
+                            "studentLastName": "Adrianne2",
+                            "studentTimeCheckIn": "08:55AM",
+                            "studentTimeCheckOut": "10:03AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "007",
+                            "studentFirstName": "Halicki2",
+                            "studentLastName": "Kennedy2",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "008",
+                            "studentFirstName": "Estwick2",
+                            "studentLastName": "Cathy2",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        }
+                    ]
+                },
+                {
+
+                    "id": 2,
+                    "classID": "534",
+                    "ClassTitle": "History class 534",
+                    "date": "Fri Jun 18, 2021",
+                    "studentTimeCheckIn": "11:05AM",
+                    "studentTimeCheckOut": "12:00AM",
+                    "classStartTime": "11:00AM",
+                    "classEndTime": "12:00PM",
+                    "students": [{
+                            "studentID": "001",
+                            "studentFirstName": "John2",
+                            "studentLastName": "Smith2",
+                            "studentTimeCheckIn": "09:05AM",
+                            "studentTimeCheckOut": "10:01AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "002",
+                            "studentFirstName": "Jen2",
+                            "studentLastName": "Adrianne2",
+                            "studentTimeCheckIn": "08:55AM",
+                            "studentTimeCheckOut": "10:03AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "003",
+                            "studentFirstName": "Halicki2",
+                            "studentLastName": "Kennedy2",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "004",
+                            "studentFirstName": "Estwick2",
+                            "studentLastName": "Cathy2",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        },
+                        {
+                            "studentID": "005",
+                            "studentFirstName": "John2",
+                            "studentLastName": "Smith2",
+                            "studentTimeCheckIn": "09:05AM",
+                            "studentTimeCheckOut": "10:01AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "006",
+                            "studentFirstName": "Jen2",
+                            "studentLastName": "Adrianne2",
+                            "studentTimeCheckIn": "08:55AM",
+                            "studentTimeCheckOut": "10:03AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "007",
+                            "studentFirstName": "Halicki2",
+                            "studentLastName": "Kennedy2",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "008",
+                            "studentFirstName": "Estwick2",
+                            "studentLastName": "Cathy2",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        }
+                    ]
+                },
+                {
+
+                    "id": 3,
+                    "classID": "134",
+                    "ClassTitle": "Physics class 134",
+                    "date": "Fri Jun 18, 2021",
+                    "studentTimeCheckIn": "2:00PM",
+                    "studentTimeCheckOut": "3:00PM",
+                    "classStartTime": "02:00PM",
+                    "classEndTime": "03:00PM",
+                    "students": [{
+                            "studentID": "001",
+                            "studentFirstName": "John3",
+                            "studentLastName": "Smith3",
+                            "studentTimeCheckIn": "09:05AM",
+                            "studentTimeCheckOut": "10:01AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "002",
+                            "studentFirstName": "Jen3",
+                            "studentLastName": "Adrianne3",
+                            "studentTimeCheckIn": "08:55AM",
+                            "studentTimeCheckOut": "10:03AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "003",
+                            "studentFirstName": "Halicki3",
+                            "studentLastName": "Kennedy3",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "004",
+                            "studentFirstName": "Estwick3",
+                            "studentLastName": "Cathy3",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        },
+                        {
+                            "studentID": "005",
+                            "studentFirstName": "John2",
+                            "studentLastName": "Smith2",
+                            "studentTimeCheckIn": "09:05AM",
+                            "studentTimeCheckOut": "10:01AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "006",
+                            "studentFirstName": "Jen2",
+                            "studentLastName": "Adrianne2",
+                            "studentTimeCheckIn": "08:55AM",
+                            "studentTimeCheckOut": "10:03AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "007",
+                            "studentFirstName": "Halicki2",
+                            "studentLastName": "Kennedy2",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "008",
+                            "studentFirstName": "Estwick2",
+                            "studentLastName": "Cathy2",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        }
+                    ]
+                },
+                {
+
+                    "id": 4,
+                    "classID": "341",
+                    "ClassTitle": "Math class 341",
+                    "date": "Fri Jun 18, 2021",
+                    "studentTimeCheckIn": "04:00PM",
+                    "studentTimeCheckOut": "05:00PM",
+                    "classStartTime": "04:00PM",
+                    "classEndTime": "05:00PM",
+                    "students": [{
+                            "studentID": "001",
+                            "studentFirstName": "John4",
+                            "studentLastName": "Smith4",
+                            "studentTimeCheckIn": "09:05AM",
+                            "studentTimeCheckOut": "10:01AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "002",
+                            "studentFirstName": "Jen4",
+                            "studentLastName": "Adrianne4",
+                            "studentTimeCheckIn": "08:55AM",
+                            "studentTimeCheckOut": "10:03AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "003",
+                            "studentFirstName": "Halicki4",
+                            "studentLastName": "Kennedy4",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "004",
+                            "studentFirstName": "Estwick4",
+                            "studentLastName": "Cathy4",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        },
+                        {
+                            "studentID": "005",
+                            "studentFirstName": "John2",
+                            "studentLastName": "Smith2",
+                            "studentTimeCheckIn": "09:05AM",
+                            "studentTimeCheckOut": "10:01AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "006",
+                            "studentFirstName": "Jen2",
+                            "studentLastName": "Adrianne2",
+                            "studentTimeCheckIn": "08:55AM",
+                            "studentTimeCheckOut": "10:03AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "007",
+                            "studentFirstName": "Halicki2",
+                            "studentLastName": "Kennedy2",
+                            "studentTimeCheckIn": "09:00AM",
+                            "studentTimeCheckOut": "10:10AM",
+                            "isPresent": true
+                        },
+                        {
+                            "studentID": "008",
+                            "studentFirstName": "Estwick2",
+                            "studentLastName": "Cathy2",
+                            "studentTimeCheckIn": "",
+                            "studentTimeCheckOut": "",
+                            "isPresent": false
+                        }
+                    ]
+                }
             ],
             userName: 'qwer',
             userRole: '',

@@ -40,6 +40,13 @@ const routes = [{
             import ('../pages/StudentListPage.vue'),
         props: true,
         name: 'studentList'
+    },
+    {
+        path: '/login',
+        component: () =>
+            import ('../pages/loginPage.vue'),
+        props: true,
+        name: 'login'
     }
 ]
 

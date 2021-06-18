@@ -12,22 +12,38 @@
                 </ion-col>
             </ion-row>
         </ion-grid>
+        <h1>student's class list</h1>
     <ion-list>
         <ion-item 
             v-for="cuClass in classes" 
             :key="cuClass.id"
             :router-link="`/submitTime/${cuClass.classID}`"
             >
-            {{cuClass.ClassTitle}} - start at {{cuClass.timeIn}}
-            <!--<ion-button @click="router.push('/submitTime'+cuClass.classID, cuClass)">NEXT</ion-button>-->
+            {{cuClass.ClassTitle}} - start at {{cuClass.classStartTime}}
             
             <ion-icon :icon="chevronForward" size="small" slot="end"></ion-icon></ion-item>
     </ion-list>
+    <h1>Faculty's class list</h1>
+    <ion-list>
+        <ion-item 
+            v-for="cuClass in classes" 
+            :key="cuClass.id"
+            :router-link="`/studentList/${cuClass.classID}`"
+            >
+            {{cuClass.ClassTitle}} - start at {{cuClass.classStartTime}}
+            
+            <ion-icon :icon="chevronForward" size="small" slot="end"></ion-icon></ion-item>
+    </ion-list>
+    <!--
+    <ion-button size="default">Reload</ion-button>
+    <ion-button size="default" @click="() => router.push('/login')">Logout</ion-button>
+    -->
     </base-layout>
 </template>
 <script>
 import { IonList, IonItem, IonIcon } from '@ionic/vue';
 import { chevronForward } from 'ionicons/icons';
+import { useRouter } from 'vue-router';
 
 export default {
 
@@ -44,6 +60,10 @@ export default {
             userRole:'',
             userID:''
         }
+    },
+    setup() {
+      const router = useRouter();
+      return { router };
     },
     methods:{
         getTodayDate(){
@@ -74,6 +94,10 @@ export default {
 
             //this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
             this.$store.dispatch('addUserName',this.userName);
+        },
+
+        gotoPage(){
+            //if (p==1) {router.push('/submitTime/154');}
         }
     },
     mounted: function () {
