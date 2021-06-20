@@ -1,5 +1,5 @@
 <template>
-  <base-layout page-title="Class Schedule" page-default-back-link="/login">
+  <base-layout page-title="Class Schedule" page-default-back-link="login">
     <ion-grid>
       <ion-row>
         <ion-col size="12">
@@ -51,10 +51,7 @@
     </ion-button>
       </ion-col></ion-row>
 </ion-grid>          
-    <ion-button expand="block" @click="() => router.push('/login')">
-      <ion-icon slot="start" :icon="lockClosedOutline"></ion-icon>
-      Logout
-    </ion-button>
+
     
   </base-layout>
 </template>

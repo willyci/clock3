@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start">
+        <ion-buttons slot="start" v-if="pageDefaultBackLink != 'login'">
           <ion-back-button
             :default-href="pageDefaultBackLink"
           ></ion-back-button>

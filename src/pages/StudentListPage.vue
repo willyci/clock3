@@ -21,13 +21,16 @@
             </ion-row>
         </ion-grid>
     <ion-row>
+                <ion-col size="2">
+                    <h3>Present</h3>  
+                </ion-col>
                 <ion-col size="4">
                     <h3>Name</h3>  
                 </ion-col>
-                <ion-col size="4">
+                <ion-col size="3">
                     <h3>Time In</h3>  
                 </ion-col>
-                <ion-col size="4">
+                <ion-col size="3">
                     <h3>Time Out</h3>  
                 </ion-col>
             </ion-row>    
@@ -36,15 +39,20 @@
             v-for="student in students" 
             :key="student.studentID"
             ><ion-grid>
+
             <ion-row ion-no-padding>
+                <ion-col size="2"><div>
+                    <ion-toggle :checked="student.isPresent"></ion-toggle></div>
+                </ion-col>
+                
                 <ion-col size="4"><div>
             {{student.studentFirstName}} {{student.studentLastName}} </div>
                 </ion-col>
-                <ion-col size="4"><div>
+                <ion-col size="3"><div>
             <ion-datetime display-format="h:mm A" disabled="false"
             minute-values="0,10,20,30,40,50" value="1990-02-19T09:00"></ion-datetime></div>
                 </ion-col>
-                <ion-col size="4"><div>            
+                <ion-col size="3"><div>            
             <ion-datetime display-format="h:mm A" 
             minute-values="0,10,20,30,40,50" value="1990-02-19T10:00"></ion-datetime></div>
                 </ion-col>
@@ -52,12 +60,30 @@
              
         </ion-item> 
     </ion-list>
-    <ion-button expand="block">Accept</ion-button>
+
+    <ion-grid>
+    <ion-row>
+      <ion-col size="5">
+          <ion-button  expand="block" @click="this.getStudents();">
+      <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
+      Refresh
+    </ion-button>
+      </ion-col>
+      <ion-col size="7">
+          <ion-button expand="block" @click="() => router.push('/login')">
+      <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
+      Accept
+    </ion-button>
+      </ion-col></ion-row>
+</ion-grid> 
     </base-layout>
 </template>
 <script>
 import { IonList, IonItem } from '@ionic/vue';
-
+import {
+  paperPlaneOutline,
+  refreshOutline,
+} from "ionicons/icons";
 export default {
 
     components:{
@@ -73,7 +99,9 @@ export default {
             userRole:'',
             userID:'',
             classID:'',
-            ClassTitle:''
+            ClassTitle:'',
+            refreshOutline,
+            paperPlaneOutline
         }
     },
     methods:{
@@ -107,3 +135,9 @@ export default {
     
 }
 </script>
+<style>
+ion-toggle {
+  --background: red;
+  --background-checked: green;
+}
+</style>

@@ -1,4 +1,5 @@
 <template>
+<base-layout page-title="Clock Login" page-default-back-link="login">
   <ion-grid>
     <ion-row>
       <ion-col size="11">
@@ -29,6 +30,7 @@
       </ion-button>
     </ion-col></ion-row
   >
+</base-layout>
 </template>
 <script>
 import { IonInput, IonItem } from "@ionic/vue";
