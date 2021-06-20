@@ -52,7 +52,7 @@
              
         </ion-item> 
     </ion-list>
-    <ion-button expand="full">Accept</ion-button>
+    <ion-button expand="block">Accept</ion-button>
     </base-layout>
 </template>
 <script>
