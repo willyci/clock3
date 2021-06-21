@@ -4,6 +4,8 @@
       <ion-row>
         <ion-col size="12">
           <h1>Today for {{ userName }}</h1>
+          <h1>ID : {{ loadUserID }}</h1>
+          <h1>ID : {{ userID }}</h1>
         </ion-col>
       </ion-row>
       <ion-row>
@@ -128,10 +130,12 @@ export default {
           this.userRole = data.role;
           this.userName = data.name;
           this.userID = data.id;
+          this.$store.commit("addUserID",data.id);
+          this.$store.commit("addClasses",data.classes);
         });
 
       //this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
-      this.$store.dispatch("addUserName", this.userName);
+      //this.$store.commit("addUserID", this.userID?this.userID:"123");
     },
 
     //gotoPage(p) {
@@ -144,5 +148,15 @@ export default {
     this.currentDate = this.getTodayDate();
     console.log("today is = " + this.currentDate);
   },
+  computed:{
+      loadUserID(){
+          //return this.$store.getters.memories;
+           //return this.$store.getters.cuClass('154');
+           //return this.$store.state.userID;
+           //console.log(this.$store.state.tesmpClasses);
+           console.log(this.$store.state.classes);
+            return this.$store.state.classes.legnth;
+      }
+  }
 };
 </script>

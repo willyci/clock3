@@ -22,13 +22,15 @@ const store = createStore({
                     description: 'Really tasty!',
                 },
             ],
-            classes: [{
+            classes: [],
+            tesmpClasses: [{
                     "id": 1,
                     "classID": "154",
                     "ClassTitle": "Med class 154",
                     "date": "Fri Jun 18, 2021",
                     "studentTimeCheckIn": "2021-06-18T09:05",
                     "studentTimeCheckOut": "2021-06-18T10:00",
+                    "timeInOut": [],
                     "classStartTime": "09:00AM",
                     "classEndTime": "10:00AM",
                     "students": [{
@@ -105,6 +107,7 @@ const store = createStore({
                     "date": "Fri Jun 18, 2021",
                     "studentTimeCheckIn": "11:05AM",
                     "studentTimeCheckOut": "12:00AM",
+                    "timeInOut": [],
                     "classStartTime": "11:00AM",
                     "classEndTime": "12:00PM",
                     "students": [{
@@ -181,6 +184,7 @@ const store = createStore({
                     "date": "Fri Jun 18, 2021",
                     "studentTimeCheckIn": "2:00PM",
                     "studentTimeCheckOut": "3:00PM",
+                    "timeInOut": [],
                     "classStartTime": "02:00PM",
                     "classEndTime": "03:00PM",
                     "students": [{
@@ -257,6 +261,7 @@ const store = createStore({
                     "date": "Fri Jun 18, 2021",
                     "studentTimeCheckIn": "04:00PM",
                     "studentTimeCheckOut": "05:00PM",
+                    "timeInOut": [],
                     "classStartTime": "04:00PM",
                     "classEndTime": "05:00PM",
                     "students": [{
@@ -327,7 +332,7 @@ const store = createStore({
                 }
             ],
             userName: 'qwer',
-            userRole: '',
+            userRole: 'student',
             userID: ''
         };
     },
@@ -344,7 +349,15 @@ const store = createStore({
         },
         addUserName(state, userName) {
             state.userName = userName;
+        },
+        addUserID(state, userID) {
+            state.userID = userID;
+        },
+
+        addClasses(state, classes) {
+            state.classes = classes;
         }
+
     },
     actions: {
         addMemory(context, memoryData) {
@@ -352,6 +365,12 @@ const store = createStore({
         },
         addUserName(context, userName) {
             context.commit('addUserName', userName);
+        },
+        addUserID(context, userID) {
+            context.commit('addUserID', userID);
+        },
+        addClasses(context, classes) {
+            context.commit('addClasses', classes);
         }
 
     },
@@ -364,16 +383,16 @@ const store = createStore({
                 return state.memories.find((memory) => memory.id === memoryId);
             };
         },
-        userID(state) {
+        getUserID(state) {
             return state.userID;
         },
-        userName(state) {
+        getUserName(state) {
             return state.userName;
         },
-        userRole(state) {
+        getUserRole(state) {
             return state.userRole;
         },
-        classes(state) {
+        getClasses(state) {
             return state.classes;
         },
         cuClass(state) {
