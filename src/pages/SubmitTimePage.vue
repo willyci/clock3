@@ -1,45 +1,43 @@
 <template>
-  <base-layout page-title="Student Attendance" page-default-back-link="/">
+  <base-layout page-title="" page-default-back-link="/">
     <ion-grid>
       <ion-row>
-        <ion-col size="12">
-          <h1>class id : {{ classID }} {{ ClassTitle }}.</h1>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="12">
+        <ion-col size="12" style="text-align: center">
+          <h3>Student Attendance</h3>
+          <h1>{{ ClassTitle }} ({{ classID }})</h1>
           <h1>{{ currentDate }}</h1>
+          <h2>({{classStartTime}} - {{classEndTime}})</h2>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size="12">
-          <h2>(9:00AM - 10:00AM)</h2>
+          
         </ion-col>
       </ion-row>
+
     </ion-grid>
 
-    <h2>.{{ userName }}</h2>
-    <h2>Current Time {{ currentTime }}</h2>
-
     <ion-grid>
       <ion-row
-        ><ion-col size="12">
+        ><ion-col size="12" style="text-align: center">
+          <h1>I am Here</h1>
           <ion-button expand="block">
             <ion-icon slot="start" :icon="logInOutline"></ion-icon>
-            Check Time In
+            {{ currentTime }}
           </ion-button>
         </ion-col></ion-row
       >
       <ion-row
-        ><ion-col size="12">
+        ><ion-col size="12" style="text-align: center">
+           <h1>I am Leaving</h1>
           <ion-button expand="block">
             <ion-icon slot="start" :icon="logOutOutline"></ion-icon>
-            Check Time Out
+            {{ currentTime }}
           </ion-button>
         </ion-col></ion-row
       >
       <ion-row
-        ><ion-col size="12">
+        ><ion-col size="12" style="text-align: center">
           <ion-button expand="block">
             <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
             Submit
@@ -68,6 +66,8 @@ export default {
       logOutOutline,
       logInOutline,
       paperPlaneOutline,
+      classStartTime: "",
+      classEndTime: ""
     };
   },
   computed: {},
@@ -103,13 +103,20 @@ export default {
       this.ClassTitle = this.$store.getters.cuClass(
         this.$route.params.id
       ).ClassTitle;
+      this.classStartTime = this.$store.getters.cuClass(
+        this.$route.params.id
+      ).classStartTime;
+      this.classEndTime = this.$store.getters.cuClass(
+        this.$route.params.id
+      ).classEndTime;
       this.userName = this.$store.getters.username;
     },
   },
   mounted: function () {
     //update table display onload
     this.gotit = this.msg;
-    this.currentDate = this.getTodayDate(); //  mm + '/' + dd + '/' + yyyy;
+    let today = new Date();
+    this.currentDate = today.toDateString();
     this.currentTime = this.getCurrentTime();
     this.classID = this.$route.params.id;
     console.log("today is = " + this.currentDate);

@@ -1,31 +1,37 @@
 <template>
-  <base-layout page-title="Class Schedule" page-default-back-link="login">
+  <base-layout page-title="" page-default-back-link="login">
     <ion-grid>
       <ion-row>
-        <ion-col size="12">
-          <h1>Today for {{ userName }}</h1>
-          <h1>ID : {{ loadUserID }}</h1>
-          <h1>ID : {{ userID }}</h1>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="12">
-          <h2>{{ currentDate }}</h2>
+        <ion-col size="12" style="text-align: center">          
+          <h3>Class Schedule</h3>
+          <h1>{{ userName }}</h1>
+          <h2 style="margin:0px;">Today</h2>
+          <h1 style="margin:0px;">{{ currentDate }}</h1>
+          <h1 style="margin:0px;">{{ currentTime}}</h1>
         </ion-col>
       </ion-row>
     </ion-grid>
-    <h1>student's class list</h1>
-    <ion-list>
-      <ion-item
-        v-for="cuClass in classes"
-        :key="cuClass.id"
-        :router-link="`/submitTime/${cuClass.classID}`"
-      >
-        {{ cuClass.ClassTitle }} - start at {{ cuClass.classStartTime }}
 
-        <ion-icon :icon="chevronForward" size="small" slot="end"></ion-icon
-      ></ion-item>
-    </ion-list>
+
+<ion-grid>
+  <ion-row
+    v-for="cuClass in classes"
+    :key="cuClass.id"
+    class="course-block"
+    @click="router.push(`/submitTime/${cuClass.classID}`)"
+  >
+  <ion-col size="8" style="text-align: left;">  
+        <ion-text>
+          <h3 style="margin:0px;" >{{ cuClass.ClassTitle }}</h3>
+        </ion-text>
+      </ion-col><ion-col size="4" style="text-align: right;"> 
+        <ion-text style="text-align: right">
+          <h3 style="margin:0px;" >{{ cuClass.classStartTime }}</h3>
+        </ion-text></ion-col>
+  </ion-row>
+</ion-grid>  
+
+    <!--
     <h1>Faculty's class list</h1>
     <ion-list>
       <ion-item
@@ -38,6 +44,7 @@
         <ion-icon :icon="chevronForward" size="small" slot="end"></ion-icon
       ></ion-item>
     </ion-list>
+    -->
 <ion-grid>
     <ion-row>
       <ion-col size="6">
@@ -58,7 +65,7 @@
   </base-layout>
 </template>
 <script>
-import { IonList, IonItem, IonIcon } from "@ionic/vue";
+import { IonIcon } from "@ionic/vue";
 import {
   chevronForward,
   lockClosedOutline,
@@ -68,14 +75,13 @@ import { useRouter } from "vue-router";
 
 export default {
   components: {
-    IonList,
-    IonItem,
     IonIcon,
   },
   data() {
     return {
       classes: [],
       currentDate: "",
+      currentTime: "",
       chevronForward,
       lockClosedOutline,
       refreshOutline,
@@ -117,6 +123,23 @@ export default {
       return today;
     },
 
+    getTime(){
+      let time = new Date();
+      var hours = time.getHours();
+      var minutes = time.getMinutes();
+      var ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      time =
+        hours +
+        ":" +
+        minutes +
+        " " +
+        ampm;
+      return time;
+    },
+
     getClass() {
       this.classes =[];  
       this.userRole ='';
@@ -145,7 +168,9 @@ export default {
   mounted: function () {
     //update table display onload
     this.getClass();
-    this.currentDate = this.getTodayDate();
+    let today = new Date();
+    this.currentDate = today.toDateString();
+    this.currentTime = this.getTime();
     console.log("today is = " + this.currentDate);
   },
   computed:{
@@ -160,3 +185,18 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+h1 {
+  font-weight: bold;
+}
+.course-block {
+    display: flex;
+    background-color: #3880ff;
+    color: white;
+    border-radius: 5px;
+    padding: 0px 10px;
+    margin-bottom: 10px;
+
+} 
+</style>
