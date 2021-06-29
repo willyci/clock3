@@ -1,11 +1,10 @@
 <template>
-<base-layout page-title="Clock Login" page-default-back-link="login">
+<base-layout page-title="" page-default-back-link="login">
   <ion-grid>
     <ion-row>
-      <ion-col size="11">
+      <ion-col size="11" style="text-align: center">
         <h1>
-          <ion-icon slot="start" :icon="timeOutline"></ion-icon> Clock
-          Attendance <ion-icon slot="end" :icon="alarmOutline"></ion-icon>
+          Student Attendance
         </h1>
         <ion-item>
           <ion-img
