@@ -1,5 +1,5 @@
 <template>
-  <base-layout page-title="" page-default-back-link="/">
+  <base-layout page-title="" page-default-back-link="classList">
     <ion-grid>
       <ion-row>
         <ion-col size="12" style="text-align: center">
@@ -30,7 +30,7 @@
       <ion-row
         ><ion-col size="12" style="text-align: center">
            <h1>I am Leaving</h1>
-          <ion-button expand="block">
+          <ion-button expand="block" @click="getCurrentTime()">
             <ion-icon slot="start" :icon="logOutOutline"></ion-icon>
             {{ currentTime }}
           </ion-button>
@@ -38,7 +38,7 @@
       >
       <ion-row
         ><ion-col size="12" style="text-align: center">
-          <ion-button expand="block">
+          <ion-button expand="block" @click="openToastSuccessful">
             <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
             Submit
           </ion-button>
@@ -49,8 +49,9 @@
 </template>
 
 <script>
-import { IonButton } from "@ionic/vue";
-import { logOutOutline, logInOutline, paperPlaneOutline } from "ionicons/icons";
+import { IonButton, toastController } from "@ionic/vue";
+import { logOutOutline, logInOutline, paperPlaneOutline  } from "ionicons/icons";
+
 export default {
   name: "SubmitTime",
   props: ["cuClass", "classProp", "msg"],
@@ -91,12 +92,21 @@ export default {
       return today;
     },
     getCurrentTime() {
-      var today = new Date();
-      today =
-        String(today.getHours()).padStart(2, "0") +
+      let time = new Date();
+      var hours = time.getHours();
+      var minutes = time.getMinutes();
+      var ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      time =
+        hours +
         ":" +
-        String(today.getMinutes()).padStart(2, "0");
-      return today;
+        minutes +
+        " " +
+        ampm;
+      console.log("current time is "+ time.toString());
+      this.currentTime = time;
     },
 
     getClassTitle() {
@@ -111,16 +121,63 @@ export default {
       ).classEndTime;
       this.userName = this.$store.getters.username;
     },
+
+    updateTime(){
+      setInterval(() => {
+        this.getCurrentTime();
+      }, 60000)
+    },
+    
+    // on submit button click,
+    // add time, student id, class id
+    // push to server
+    // add to local storage
+    // on successful call openToastSuccessful
+    // on faile call openToastFailed
+    onSubmit(){
+
+    },
+
+    async openToastSuccessful() {
+      const toast = await toastController
+        .create({
+          message: 'Submit Successful.',
+          position: 'top',
+          duration: 1000,
+          color: 'success'
+        })
+      toast.present();
+      toast.onDidDismiss().then(()=>{
+        this.$router.go(-1);
+      })
+    },
+    
+
+    async openToastFailed() {
+      const toast = await toastController
+        .create({
+          message: 'Failed submit, server error, please try again.',
+          position: 'top',
+          duration: 1000,
+          color: 'danger'
+        })
+      toast.present();
+    },
   },
   mounted: function () {
     //update table display onload
     this.gotit = this.msg;
     let today = new Date();
     this.currentDate = today.toDateString();
-    this.currentTime = this.getCurrentTime();
+    this.getCurrentTime();
     this.classID = this.$route.params.id;
     console.log("today is = " + this.currentDate);
     this.getClassTitle();
+    this.updateTime();
   },
 };
 </script>
+
+<style scoped>
+
+</style>

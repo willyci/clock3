@@ -44,7 +44,7 @@
         <ion-icon :icon="chevronForward" size="small" slot="end"></ion-icon
       ></ion-item>
     </ion-list>
-    -->
+    
 <ion-grid>
     <ion-row>
       <ion-col size="6">
@@ -60,12 +60,12 @@
     </ion-button>
       </ion-col></ion-row>
 </ion-grid>          
-
+-->
     
   </base-layout>
 </template>
 <script>
-import { IonIcon } from "@ionic/vue";
+//import { IonIcon } from "@ionic/vue";
 import {
   chevronForward,
   lockClosedOutline,
@@ -75,7 +75,7 @@ import { useRouter } from "vue-router";
 
 export default {
   components: {
-    IonIcon,
+    //IonIcon,
   },
   data() {
     return {
@@ -123,7 +123,7 @@ export default {
       return today;
     },
 
-    getTime(){
+    getCurrentTime(){
       let time = new Date();
       var hours = time.getHours();
       var minutes = time.getMinutes();
@@ -137,7 +137,8 @@ export default {
         minutes +
         " " +
         ampm;
-      return time;
+        console.log("current time is "+ time.toString());
+      this.currentTime = time;
     },
 
     getClass() {
@@ -156,10 +157,20 @@ export default {
           this.$store.commit("addUserID",data.id);
           this.$store.commit("addClasses",data.classes);
         });
-
+      console.log("got data");
       //this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
       //this.$store.commit("addUserID", this.userID?this.userID:"123");
     },
+
+    updateTime(){
+      setInterval(() => {
+        this.getCurrentTime();
+      }, 60000)
+    },
+
+
+
+
 
     //gotoPage(p) {
       //if (p==1) {router.push('/login');}
@@ -170,7 +181,8 @@ export default {
     this.getClass();
     let today = new Date();
     this.currentDate = today.toDateString();
-    this.currentTime = this.getTime();
+    this.getCurrentTime();
+    this.updateTime();
     console.log("today is = " + this.currentDate);
   },
   computed:{

@@ -1,5 +1,5 @@
 <template>
-<base-layout page-title="" page-default-back-link="login">
+<base-layout page-title="" page-default-back-link="/">
   <ion-grid>
     <ion-row>
       <ion-col size="11" style="text-align: center">
