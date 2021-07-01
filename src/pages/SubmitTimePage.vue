@@ -3,10 +3,10 @@
     <ion-grid>
       <ion-row>
         <ion-col size="12" style="text-align: center">
-          <h3>Student Attendance</h3>
-          <h1>{{ ClassTitle }} ({{ classID }})</h1>
-          <h1>{{ currentDate }}</h1>
-          <h2>({{classStartTime}} - {{classEndTime}})</h2>
+          <h4>Student Attendance</h4>
+          <h2 style="margin:0px;font-weight:bold;">{{ ClassTitle }} ({{ classID }})</h2>
+          <h4 style="margin:0px;">{{ currentDate }}</h4>
+          <h4 style="margin:0px;">{{classStartTime}} - {{classEndTime}}</h4>
         </ion-col>
       </ion-row>
       <ion-row>
@@ -18,24 +18,14 @@
     </ion-grid>
 
     <ion-grid>
-      <ion-row
-        ><ion-col size="12" style="text-align: center">
-          <h1>I am Here</h1>
-          <ion-button expand="block">
-            <ion-icon slot="start" :icon="logInOutline"></ion-icon>
-            {{ currentTime }}
-          </ion-button>
-        </ion-col></ion-row
-      >
-      <ion-row
-        ><ion-col size="12" style="text-align: center">
-           <h1>I am Leaving</h1>
-          <ion-button expand="block" @click="getCurrentTime()">
-            <ion-icon slot="start" :icon="logOutOutline"></ion-icon>
-            {{ currentTime }}
-          </ion-button>
-        </ion-col></ion-row
-      >
+      <ion-row><ion-col size="12" style="text-align: center">
+          <h1 style="font-weight:bold;">Time IN</h1>
+          <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
+        </ion-col></ion-row>
+      <ion-row><ion-col size="12" style="text-align: center">
+           <h1 style="font-weight:bold;">Time OUT</h1>
+          <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
+        </ion-col></ion-row>
       <ion-row
         ><ion-col size="12" style="text-align: center">
           <ion-button expand="block" @click="openToastSuccessful">

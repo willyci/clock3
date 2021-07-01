@@ -3,11 +3,12 @@
     <ion-grid>
       <ion-row>
         <ion-col size="12" style="text-align: center">          
-          <h3>Class Schedule</h3>
-          <h1>{{ userName }}</h1>
+          <h4>Class Schedule</h4>
+          <h2 style="font-weight:bold;">{{ userName }}</h2>
           <h2 style="margin:0px;">Today</h2>
-          <h1 style="margin:0px;">{{ currentDate }}</h1>
-          <h1 style="margin:0px;">{{ currentTime}}</h1>
+          <h2 style="margin:0px;font-weight:bold;">{{ currentDate }}</h2>
+          <h2 style="margin:0px;font-weight:bold;padding-bottom:40px;">{{ currentTime}}</h2>
+          
         </ion-col>
       </ion-row>
     </ion-grid>
