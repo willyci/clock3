@@ -18,22 +18,20 @@
     </ion-grid>
 
     <ion-grid>
-      <ion-row><ion-col size="12" style="text-align: center">
+      <ion-row v-if="InOutFlag"><ion-col size="12" style="text-align: center">
           <h1 style="font-weight:bold;">Time IN</h1>
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
         </ion-col></ion-row>
-      <ion-row><ion-col size="12" style="text-align: center">
+      <ion-row v-if="!InOutFlag"><ion-col size="12" style="text-align: center">
            <h1 style="font-weight:bold;">Time OUT</h1>
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
         </ion-col></ion-row>
-      <ion-row
-        ><ion-col size="12" style="text-align: center">
-          <ion-button expand="block" @click="openToastSuccessful">
+      <ion-row><ion-col size="12" style="text-align: center">
+          <ion-button expand="block" @click="onSubmit">
             <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
             Submit
           </ion-button>
-        </ion-col></ion-row
-      >
+        </ion-col></ion-row>
     </ion-grid>
   </base-layout>
 </template>
@@ -58,7 +56,8 @@ export default {
       logInOutline,
       paperPlaneOutline,
       classStartTime: "",
-      classEndTime: ""
+      classEndTime: "",
+      InOutFlag: true,
     };
   },
   computed: {},
@@ -110,6 +109,11 @@ export default {
         this.$route.params.id
       ).classEndTime;
       this.userName = this.$store.getters.username;
+
+      this.InOutFlag = (this.$store.getters.cuClass(
+        this.$route.params.id
+      ).timeInOut.length % 2 == 0 )  ? true : false;
+
     },
 
     updateTime(){
@@ -125,7 +129,15 @@ export default {
     // on successful call openToastSuccessful
     // on faile call openToastFailed
     onSubmit(){
+      this.$store.getters.cuClass(
+        this.$route.params.id
+      ).timeInOut.push(this.currentTime);
+      
+      console.log(this.$store.getters.cuClass(
+        this.$route.params.id
+      ).timeInOut);
 
+      this.openToastSuccessful();
     },
 
     async openToastSuccessful() {
