@@ -1,9 +1,9 @@
 <template>
-  <base-layout page-title="" page-default-back-link="login">
+  <base-layout page-title="Class Schedule" page-default-back-link="login">
     <ion-grid>
       <ion-row>
         <ion-col size="12" style="text-align: center">          
-          <h4>Class Schedule</h4>
+          <!--<h4>Class Schedule</h4>-->
           <h2 style="font-weight:bold;">{{ userName }}</h2>
           <h2 style="margin:0px;">Today</h2>
           <h2 style="margin:0px;font-weight:bold;">{{ currentDate }}</h2>
@@ -13,8 +13,9 @@
       </ion-row>
     </ion-grid>
 
-
-<ion-grid>
+<!-------------------------------------->
+<!--
+<ion-grid v-if="isStudent == true">
   <ion-row
     v-for="cuClass in classes"
     :key="cuClass.id"
@@ -31,38 +32,47 @@
         </ion-text></ion-col>
   </ion-row>
 </ion-grid>  
-
-    <!--
-    <h1>Faculty's class list</h1>
-    <ion-list>
-      <ion-item
-        v-for="cuClass in classes"
-        :key="cuClass.id"
-        :router-link="`/studentList/${cuClass.classID}`"
-      >
-        {{ cuClass.ClassTitle }} - start at {{ cuClass.classStartTime }}
-
-        <ion-icon :icon="chevronForward" size="small" slot="end"></ion-icon
-      ></ion-item>
-    </ion-list>
-    
-<ion-grid>
-    <ion-row>
-      <ion-col size="6">
-          <ion-button  expand="block" @click="this.getClass();">
-      <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
-      Refresh
-    </ion-button>
-      </ion-col>
-      <ion-col size="6">
-          <ion-button expand="block" @click="() => router.push('/login')">
-      <ion-icon slot="start" :icon="lockClosedOutline"></ion-icon>
-      Logout
-    </ion-button>
-      </ion-col></ion-row>
-</ion-grid>          
 -->
+<!-------------------------------------->
+<ion-grid v-if="isStudent == true">
+  <ion-row
+    v-for="cuClass in classes"
+    :key="cuClass.id"
+    class="course-block"
+    @click="router.push(`/submitTime/${cuClass.classID}`)"
+  >
+        <ion-text style="margin: 5px 0px;">          
+          <span>{{ cuClass.classStartTime }}</span><br/>
+          <span>{{ cuClass.ClassTitle }} </span>  
+          <span> ( {{ cuClass.classID }} )</span>
+        </ion-text>
+      
+  </ion-row>
+</ion-grid> 
+<!-------------------------------------->
+
+<ion-grid v-if="isStudent != true">
+  <ion-row
+    v-for="cuClass in classes"
+    :key="cuClass.id"
+    class="course-block"
+    @click="router.push(`/studentList/${cuClass.classID}`)"
+  >
+        <ion-text style="margin: 5px 0px;">          
+          <span>{{ cuClass.classStartTime }}</span><br/>
+          <span>{{ cuClass.ClassTitle }}</span> 
+          <span> ( {{ cuClass.classID }} )</span>
+        </ion-text>
+      
+  </ion-row>
+</ion-grid> 
+<!-------------------------------------->
+
     
+         
+<!-------------------------------------->
+    <ion-button @click="switchRoll">
+    <ion-icon slot="start" :icon="gitCompareOutline"  @click="switchRoll"></ion-icon><span v-if="isStudent == true">student</span><span v-if="isStudent != true">faculty</span></ion-button>
   </base-layout>
 </template>
 <script>
@@ -71,6 +81,7 @@ import {
   chevronForward,
   lockClosedOutline,
   refreshOutline,
+  gitCompareOutline,
 } from "ionicons/icons";
 import { useRouter } from "vue-router";
 
@@ -86,10 +97,12 @@ export default {
       chevronForward,
       lockClosedOutline,
       refreshOutline,
+      gitCompareOutline,
       msg: "hi",
       userName: "",
       userRole: "",
       userID: "",
+      isStudent : true,
     };
   },
   setup() {
@@ -169,7 +182,9 @@ export default {
       }, 60000)
     },
 
-
+  switchRoll(){
+    this.isStudent = !this.isStudent;
+  }
 
 
 

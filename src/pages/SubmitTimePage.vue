@@ -1,9 +1,9 @@
 <template>
-  <base-layout page-title="" page-default-back-link="classList">
+  <base-layout page-title="Student Attendance" page-default-back-link="classList">
     <ion-grid>
       <ion-row>
         <ion-col size="12" style="text-align: center">
-          <h4>Student Attendance</h4>
+          <!--<h4>Student Attendance</h4>-->
           <h2 style="margin:0px;font-weight:bold;">{{ ClassTitle }} ({{ classID }})</h2>
           <h4 style="margin:0px;">{{ currentDate }}</h4>
           <h4 style="margin:0px;">{{classStartTime}} - {{classEndTime}}</h4>

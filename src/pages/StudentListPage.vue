@@ -1,76 +1,56 @@
 <template>
     <base-layout 
         page-title="Faculty Acceptance"
-        page-default-back-link="/"
-    >    
-    <ion-grid>
-            <ion-row>
-                <ion-col size="12">
-                    <h1>class id : {{classID}} - {{ClassTitle}}.</h1>  
-                </ion-col>
-            </ion-row>
-            <ion-row>
-                <ion-col size="12">
-                    <h1>{{currentDate}}</h1>  
-                </ion-col>
-            </ion-row>
-            <ion-row>
-                <ion-col size="12">
-                    <h2>(9:00AM - 10:00AM)</h2>
-                </ion-col>
-            </ion-row>
-        </ion-grid>
-    <ion-row>
-                <ion-col size="2">
-                    <h3>Present</h3>  
-                </ion-col>
-                <ion-col size="4">
-                    <h3>Name</h3>  
-                </ion-col>
-                <ion-col size="3">
-                    <h3>Time In</h3>  
-                </ion-col>
-                <ion-col size="3">
-                    <h3>Time Out</h3>  
-                </ion-col>
-            </ion-row>    
+        page-default-back-link="classList"
+    >
+        <ion-grid>
+      <ion-row>
+        <ion-col size="12" style="text-align: center">
+          <!--<h4>Faculty Acceptance</h4>-->
+          <h2 style="margin:0px;font-weight:bold;">{{ ClassTitle }} ({{ classID }})</h2>
+          <h4 style="margin:0px;">{{ currentDate }}</h4>
+          <h4 style="margin:0px;">{{classStartTime}} - {{classEndTime}}</h4>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+
+
+
     <ion-list>
         <ion-item 
             v-for="student in students" 
             :key="student.studentID"
             ><ion-grid>
-
             <ion-row ion-no-padding>
-                <ion-col size="2"><div>
-                    <ion-toggle :checked="student.isPresent"></ion-toggle></div>
+                <ion-col size="2"><div><ion-img
+            src="../../assets/default-avatar.png"
+            
+          ></ion-img></div></ion-col>
+                <ion-col size="10">
+                    <div><span style="font-weight:bold;">{{student.studentFirstName}} {{student.studentLastName}} </span></div>
+                    <ion-row style="align-content: flex-start;" v-if="student.isPresent">
+                        <ion-col size="6" v-for="time in student.timeInOut" :key="time.studentID"><div>{{time}}</div></ion-col>
+                        <!--
+                        <ion-col size="6"><div>10:30 AM</div></ion-col>                    
+                        <ion-col size="6"><div>10:40 AM</div></ion-col>
+                        <ion-col size="6"><div>11:00 AM</div></ion-col>
+                        -->
+                    </ion-row>
+                    <ion-row style="align-content: flex-start;" v-if="!student.isPresent">
+                        <ion-col size="12"><span style="color:red;">None</span></ion-col>
+                    </ion-row>
                 </ion-col>
-                
-                <ion-col size="4"><div>
-            {{student.studentFirstName}} {{student.studentLastName}} </div>
-                </ion-col>
-                <ion-col size="3"><div>
-            <ion-datetime display-format="h:mm A" disabled="false"
-            minute-values="0,10,20,30,40,50" value="1990-02-19T09:00"></ion-datetime></div>
-                </ion-col>
-                <ion-col size="3"><div>            
-            <ion-datetime display-format="h:mm A" 
-            minute-values="0,10,20,30,40,50" value="1990-02-19T10:00"></ion-datetime></div>
-                </ion-col>
-             </ion-row>    </ion-grid>
+            </ion-row>    
+        </ion-grid>
              
         </ion-item> 
     </ion-list>
 
     <ion-grid>
     <ion-row>
-      <ion-col size="5">
-          <ion-button  expand="block" @click="this.getStudents();">
-      <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
-      Refresh
-    </ion-button>
-      </ion-col>
-      <ion-col size="7">
-          <ion-button expand="block" @click="() => router.push('/login')">
+      <ion-col size="12">
+          <ion-button expand="block" @click="onSubmit">
       <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
       Accept
     </ion-button>
@@ -79,7 +59,7 @@
     </base-layout>
 </template>
 <script>
-import { IonList, IonItem } from '@ionic/vue';
+import { IonList, IonItem, toastController } from '@ionic/vue';
 import {
   paperPlaneOutline,
   refreshOutline,
@@ -87,7 +67,7 @@ import {
 export default {
 
     components:{
-        IonList, IonItem,
+        IonList, IonItem, 
     },
     data() {
         return {
@@ -101,36 +81,94 @@ export default {
             classID:'',
             ClassTitle:'',
             refreshOutline,
-            paperPlaneOutline
+            paperPlaneOutline,            
+            classStartTime: "",
+            classEndTime: "",
         }
     },
     methods:{
-        getTodayDate(){
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var yyyy = today.getFullYear();
+            getTodayDate() {
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, "0");
+                var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+                var yyyy = today.getFullYear();
+                today =
+                    mm +
+                    "/" +
+                    dd +
+                    "/" +
+                    yyyy +
+                    String(today.getHours()).padStart(2, "0") +
+                    String(today.getMinutes()).padStart(2, "0");
 
-            var hours = today.getHours();
-            var minutes = today.getMinutes();
-            var ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; // the hour '0' should be '12'
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            today = mm + '/' + dd + '/' + yyyy + ' -- ' + hours + ':' + minutes + ' ' + ampm;            
-            return today;
-        },
+                //this.currentTime = String(today.getHours()).padStart(2, '0') + ":" + String(today.getMinutes()).padStart(2, '0');
+                return today;
+                },
+                getCurrentTime() {
+                let time = new Date();
+                var hours = time.getHours();
+                var minutes = time.getMinutes();
+                var ampm = hours >= 12 ? "PM" : "AM";
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                time =
+                    hours +
+                    ":" +
+                    minutes +
+                    " " +
+                    ampm;
+                console.log("current time is "+ time.toString());
+                this.currentTime = time;
+                },
 
         getStudents(){
-            this.students = this.$store.getters.cuClass(this.$route.params.id).students;     
+            this.students = this.$store.getters.cuClass(this.$route.params.id).students;  
+            console.log(this.students);   
             this.classID  = this.$store.getters.cuClass(this.$route.params.id).classID;   
-            this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle; 
-        }
+            this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
+            this.classStartTime = this.$store.getters.cuClass(
+                this.$route.params.id
+            ).classStartTime;
+            this.classEndTime = this.$store.getters.cuClass(
+                this.$route.params.id
+            ).classEndTime;
+        },
+
+        onSubmit(){
+            this.openToastSuccessful();
+        },
+            async openToastSuccessful() {
+            const toast = await toastController
+                .create({
+                message: 'Submit Successful.',
+                position: 'top',
+                duration: 1000,
+                color: 'success'
+                })
+            toast.present();
+            toast.onDidDismiss().then(()=>{
+                this.$router.go(-1);
+            })
+            },
+            
+
+            async openToastFailed() {
+            const toast = await toastController
+                .create({
+                message: 'Failed submit, server error, please try again.',
+                position: 'top',
+                duration: 1000,
+                color: 'danger'
+                })
+            toast.present();
+            },
     },
     mounted: function () {
       //update table display onload
       this.getStudents();
-      this.currentDate =this.getTodayDate();
+      let today = new Date();
+      this.currentDate = today.toDateString();
   }
     
 }
