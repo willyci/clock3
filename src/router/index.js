@@ -47,7 +47,14 @@ const routes = [{
             import ('../pages/loginPage.vue'),
         props: true,
         name: 'login'
-    }
+    },
+    {
+        path: '/editTimes/:cid/:sid',
+        component: () =>
+            import ('../pages/EditTimes.vue'),
+        props: true,
+        name: 'editTimes'
+    },
 ]
 
 const router = createRouter({

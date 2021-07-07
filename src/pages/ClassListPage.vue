@@ -1,5 +1,8 @@
 <template>
   <base-layout page-title="Class Schedule" page-default-back-link="login">
+
+
+
     <ion-grid>
       <ion-row>
         <ion-col size="12" style="text-align: center">          
@@ -72,11 +75,16 @@
          
 <!-------------------------------------->
     <ion-button @click="switchRoll">
-    <ion-icon slot="start" :icon="gitCompareOutline"  @click="switchRoll"></ion-icon><span v-if="isStudent == true">student</span><span v-if="isStudent != true">faculty</span></ion-button>
+    <ion-icon slot="start" :icon="gitCompareOutline"  @click="switchRoll"></ion-icon>
+    <span v-if="isStudent == true">student</span>
+    <span v-if="isStudent != true">faculty</span>
+    </ion-button>
   </base-layout>
 </template>
 <script>
 //import { IonIcon } from "@ionic/vue";
+//import {  IonRefresher, IonRefresherContent } from '@ionic/vue';
+
 import {
   chevronForward,
   lockClosedOutline,
@@ -84,6 +92,7 @@ import {
   gitCompareOutline,
 } from "ionicons/icons";
 import { useRouter } from "vue-router";
+
 
 export default {
   components: {
@@ -187,6 +196,7 @@ export default {
   }
 
 
+  
 
     //gotoPage(p) {
       //if (p==1) {router.push('/login');}

@@ -29,15 +29,16 @@
           ></ion-img></div></ion-col>
                 <ion-col size="10">
                     <div><span style="font-weight:bold;">{{student.studentFirstName}} {{student.studentLastName}} </span></div>
-                    <ion-row style="align-content: flex-start;" v-if="student.isPresent">
-                        <ion-col size="6" v-for="time in student.timeInOut" :key="time.studentID"><div>{{time}}</div></ion-col>
-                        <!--
-                        <ion-col size="6"><div>10:30 AM</div></ion-col>                    
-                        <ion-col size="6"><div>10:40 AM</div></ion-col>
-                        <ion-col size="6"><div>11:00 AM</div></ion-col>
-                        -->
+                    <ion-row style="align-content: flex-start;" v-if="student.isPresent"
+                    @click="router.push(`/editTimes/${classID}/${student.studentID}`)"
+                    >
+                    
+
+                        <ion-col size="6" v-for="time in student.timeInOut" :key="time.studentID"><div>{{time}}</div></ion-col>                       
                     </ion-row>
-                    <ion-row style="align-content: flex-start;" v-if="!student.isPresent">
+                    <ion-row style="align-content: flex-start;" v-if="!student.isPresent"
+                    @click="router.push(`/editTimes/${classID}/${student.studentID}`)"
+                    >
                         <ion-col size="12"><span style="color:red;">None</span></ion-col>
                     </ion-row>
                 </ion-col>
@@ -64,11 +65,17 @@ import {
   paperPlaneOutline,
   refreshOutline,
 } from "ionicons/icons";
+import { useRouter } from "vue-router";
 export default {
 
     components:{
         IonList, IonItem, 
     },
+    
+  setup() {
+    const router = useRouter();
+    return { router };
+  },
     data() {
         return {
             classes:[],

@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start" v-if="pageDefaultBackLink == 'classList'">
+        <ion-buttons slot="start" v-if="pageDefaultBackLink == 'classList' || pageDefaultBackLink == 'studentList'">
           <ion-back-button
             :default-href="pageDefaultBackLink"
           ></ion-back-button>
@@ -12,13 +12,18 @@
             <ion-icon slot="start" :icon="lockClosedOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>{{ pageTitle }}</ion-title>
+        <ion-title class="ion-text-center">{{ pageTitle }}</ion-title>
         <ion-buttons slot="end">
           <slot name="actions-end"></slot>
         </ion-buttons>
         <ion-buttons slot="end" v-if="pageDefaultBackLink == 'login'">
           <ion-button id="changeText" @click="reload()">
             <ion-icon slot="end" :icon="refreshOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end" v-if="pageDefaultBackLink != 'login'">
+          <ion-button id="changeText" >
+            <span> </span>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
