@@ -23,14 +23,14 @@
                             <div><span v-if="index%2 === 0 " style="display: inline-block;min-width:40px;">IN</span>
                                 <span v-if="index%2 != 0 " style="display: inline-block;min-width:40px;">OUT</span>
                                 <span style="display: inline-block;min-width:100px;">{{time}} </span>
-                                <ion-button  @click="onSubmit" style="height:24px;">
+                                <ion-button  @click="removeSelectedTime(index)" style="height:24px;">
                                     <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon>
                                     </ion-button>
                             </div>
                         
                         </ion-col>
                         <ion-col size="12">
-                        <ion-button  @click="addNewTime" style="width:120px;"><ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add</ion-button>
+                        <ion-button  @click="addNewTime(student)" style="width:120px;"><ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add</ion-button>
                         </ion-col>
                         <!--<ion-datetime display-format="h:mm A" minute-values="0,10,20,30,40,50" :value="time" id="tt"></ion-datetime>-->
                     </ion-row>
@@ -42,7 +42,7 @@
     <ion-grid>
     <ion-row>
       <ion-col size="12">
-          <ion-button expand="block" @click="removeSelectedTime">
+          <ion-button expand="block" @click="onSubmit">
       <ion-icon slot="start" :icon="createOutline"></ion-icon>
       Update
     </ion-button>
@@ -108,9 +108,17 @@ export default {
         },
 
         // remove selected time, update list
-        removeSelectedTime(){},
+        removeSelectedTime(index){
+            // pick selected time
+            console.log(index);
+
+        },
         // add time to end of list, update list
-        addNewTime(){},
+        addNewTime(student){
+            // new time add to array, 
+            // bring up time picket
+            console.log(student);
+        },
 
         onSubmit(){
             this.openToastSuccessful();
