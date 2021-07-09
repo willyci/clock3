@@ -333,7 +333,9 @@ const store = createStore({
             ],
             userName: 'qwer',
             userRole: 'student',
-            userID: ''
+            userID: '',
+            token: '',
+            school: ''
         };
     },
     mutations: {
@@ -356,6 +358,13 @@ const store = createStore({
 
         addClasses(state, classes) {
             state.classes = classes;
+        },
+
+        addToken(state, token) {
+            state.token = token;
+        },
+        addSchool(state, school) {
+            state.school = school;
         }
 
     },
@@ -371,6 +380,12 @@ const store = createStore({
         },
         addClasses(context, classes) {
             context.commit('addClasses', classes);
+        },
+        addToken(context, token) {
+            context.commit('addToken', token);
+        },
+        addSchool(context, school) {
+            context.commit('addSchool', school);
         }
 
     },
@@ -399,6 +414,12 @@ const store = createStore({
             return (classID) => {
                 return state.classes.find((cuClass) => cuClass.classID === classID)
             }
+        },
+        getToken(state) {
+            return state.token;
+        },
+        getSchool(state) {
+            return state.school;
         }
     },
 });

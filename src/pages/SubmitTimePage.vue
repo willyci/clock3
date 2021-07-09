@@ -108,8 +108,9 @@ export default {
       this.classEndTime = this.$store.getters.cuClass(
         this.$route.params.id
       ).classEndTime;
-      this.userName = this.$store.getters.username;
-
+      this.userName = this.$store.getters.getUserName;
+      console.log("username = "+JSON.stringify(this.$store.getters.getUserName));
+      
       this.InOutFlag = (this.$store.getters.cuClass(
         this.$route.params.id
       ).timeInOut.length % 2 == 0 )  ? true : false;

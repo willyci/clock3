@@ -12,10 +12,33 @@
         </ion-col>
       </ion-row>
     </ion-grid>
+    <!--------->
+    <ion-grid>
+        <ion-row>
+            <ion-col size='5'>IN</ion-col>
+            <ion-col size='5'>OUT</ion-col>
+        </ion-row>
+    </ion-grid> 
+    <!--------->
 
+    <ion-grid>
+        <ion-row>
+            <ion-col size="8">
+                <ion-col size="5" v-for="(time) in student.timeInOut" :key="time.studentID">
+                    <span style="display: inline-block;min-width:100px;">{{time}} </span>
+                </ion-col>
+            </ion-col>
+            <ion-col size="3">
+            <ion-col size="12" v-for="(time, index) in student.timeInOut" :key="time.studentID" >
+                <ion-button  @click="removeSelectedTime(index)" style="height:24px;" v-if="index%2 === 0 ">
+                 <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button>
+            </ion-col>
+            </ion-col>
+        </ion-row>
+    </ion-grid> 
 
-
-    <ion-list>
+    <!--------->
+    <!--<ion-list>
         <ion-item> 
                 <ion-col size="10">
                     <ion-row style="align-content: flex-start;" v-if="student.isPresent">
@@ -23,22 +46,29 @@
                             <div><span v-if="index%2 === 0 " style="display: inline-block;min-width:40px;">IN</span>
                                 <span v-if="index%2 != 0 " style="display: inline-block;min-width:40px;">OUT</span>
                                 <span style="display: inline-block;min-width:100px;">{{time}} </span>
-                                <ion-button  @click="removeSelectedTime(index)" style="height:24px;">
-                                    <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon>
-                                    </ion-button>
+                                
                             </div>
                         
                         </ion-col>
+                        <ion-button  @click="removeSelectedTime(index)" style="height:24px;">
+                                    <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon>
+                                    </ion-button>
                         <ion-col size="12">
                         <ion-button  @click="addNewTime(student)" style="width:120px;"><ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add</ion-button>
                         </ion-col>
-                        <!--<ion-datetime display-format="h:mm A" minute-values="0,10,20,30,40,50" :value="time" id="tt"></ion-datetime>-->
+                        <ion-datetime display-format="h:mm A" minute-values="0,10,20,30,40,50" :value="time" id="tt"></ion-datetime>
                     </ion-row>
                 </ion-col>
 
         </ion-item> 
-    </ion-list>
-
+    </ion-list>-->
+    <!--------->
+    <ion-grid>
+        <ion-row>
+            <ion-col size="8"><ion-button  @click="addNewTime(student)" style="width:120px;"><ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add</ion-button></ion-col>
+        </ion-row>
+    </ion-grid> 
+    <!--------->
     <ion-grid>
     <ion-row>
       <ion-col size="12">
@@ -51,7 +81,7 @@
     </base-layout>
 </template>
 <script>
-import { IonList, IonItem, toastController } from '@ionic/vue';
+import {  toastController } from '@ionic/vue';
 import { createOutline, closeCircleOutline, addCircleOutline  } from "ionicons/icons";
 
 export default {
@@ -66,7 +96,7 @@ export default {
         },
     },
     components:{
-        IonList, IonItem, 
+        //IonList, IonItem, 
     },
     data() {
         return {
