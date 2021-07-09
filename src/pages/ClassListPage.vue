@@ -38,7 +38,7 @@
 -->
 <!-------------------------------------->
 <ion-grid v-if="isStudent == true">
-  <ion-row
+  <ion-row style="background:#54595f;"
     v-for="cuClass in classes"
     :key="cuClass.id"
     class="course-block"
@@ -55,7 +55,7 @@
 <!-------------------------------------->
 
 <ion-grid v-if="isStudent != true">
-  <ion-row
+  <ion-row style="background:#54595f;"
     v-for="cuClass in classes"
     :key="cuClass.id"
     class="course-block"

@@ -51,7 +51,7 @@
     <ion-grid>
     <ion-row>
       <ion-col size="12">
-          <ion-button expand="block" @click="onSubmit">
+          <ion-button expand="block" @click="onSubmit"  style="--background:#ff796a;">
       <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
       Accept
     </ion-button>

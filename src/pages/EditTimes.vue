@@ -15,8 +15,8 @@
     <!--------->
     <ion-grid>
         <ion-row>
-            <ion-col size='5'>IN</ion-col>
-            <ion-col size='5'>OUT</ion-col>
+            <ion-col size='3' style="margin-left:25px;">IN</ion-col>
+            <ion-col size='5' style="margin-left:25px;">OUT</ion-col>
         </ion-row>
     </ion-grid> 
     <!--------->
@@ -25,12 +25,12 @@
         <ion-row>
             <ion-col size="8">
                 <ion-col size="5" v-for="(time) in student.timeInOut" :key="time.studentID">
-                    <span style="display: inline-block;min-width:100px;">{{time}} </span>
+                    <span style="display: inline-block;min-width:100px; height:40px;">{{time}} </span>
                 </ion-col>
             </ion-col>
             <ion-col size="3">
             <ion-col size="12" v-for="(time, index) in student.timeInOut" :key="time.studentID" >
-                <ion-button  @click="removeSelectedTime(index)" style="height:24px;" v-if="index%2 === 0 ">
+                <ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#54595f;" v-if="index%2 === 0 ">
                  <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button>
             </ion-col>
             </ion-col>
@@ -65,14 +65,17 @@
     <!--------->
     <ion-grid>
         <ion-row>
-            <ion-col size="8"><ion-button  @click="addNewTime(student)" style="width:120px;"><ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add</ion-button></ion-col>
+            <ion-col size="12">
+                <ion-button  @click="addNewTime(student)" style="--background:#54595f;padding:0 90px;" expand="full">
+                    <ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add Time</ion-button>
+            </ion-col>
         </ion-row>
     </ion-grid> 
     <!--------->
     <ion-grid>
     <ion-row>
       <ion-col size="12">
-          <ion-button expand="block" @click="onSubmit">
+          <ion-button expand="block" @click="onSubmit" style="--background:#ff796a;">
       <ion-icon slot="start" :icon="createOutline"></ion-icon>
       Update
     </ion-button>

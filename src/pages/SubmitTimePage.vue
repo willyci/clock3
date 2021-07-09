@@ -27,7 +27,7 @@
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
         </ion-col></ion-row>
       <ion-row><ion-col size="12" style="text-align: center">
-          <ion-button expand="block" @click="onSubmit">
+          <ion-button expand="block" @click="onSubmit" style="--background:#ff796a;">
             <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
             Submit
           </ion-button>

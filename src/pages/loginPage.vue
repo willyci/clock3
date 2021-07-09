@@ -36,7 +36,7 @@
   <ion-row
     ><ion-col size="12">
       <!--<ion-button expand="block" @click="() => router.push('/classList')">-->
-        <ion-button expand="block" @click="loginSubmit()">
+        <ion-button expand="block" @click="loginSubmit()" style="--background:#ff796a;">
         <ion-icon slot="start" :icon="lockOpenOutline"></ion-icon>
         Login
       </ion-button>
