@@ -335,7 +335,9 @@ const store = createStore({
             userRole: 'student',
             userID: '',
             token: '',
-            school: ''
+            school: '',
+            isInstructor: false,
+            isStudent: true
         };
     },
     mutations: {
@@ -365,6 +367,12 @@ const store = createStore({
         },
         addSchool(state, school) {
             state.school = school;
+        },
+        addStudent(state, isStudent) {
+            state.isStudent = isStudent;
+        },
+        addInstructor(state, isInstructor) {
+            state.isInstructor = isInstructor;
         }
 
     },
@@ -386,6 +394,12 @@ const store = createStore({
         },
         addSchool(context, school) {
             context.commit('addSchool', school);
+        },
+        addStudent(context, isStudent) {
+            context.commit('addStudent', isStudent);
+        },
+        addInstructor(context, isInstructor) {
+            context.commit('addInstructor', isInstructor);
         }
 
     },
@@ -418,9 +432,13 @@ const store = createStore({
         getToken(state) {
             return state.token;
         },
-        getSchool(state) {
-            return state.school;
-        }
+        getIsStudent(state) {
+            return state.isStudent;
+        },
+        getIsInstructor(state) {
+            return state.isInstructor;
+        },
+
     },
 });
 

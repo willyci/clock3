@@ -52,6 +52,23 @@
       
   </ion-row>
 </ion-grid> 
+
+<ion-grid v-if="isStudent == true">
+  <ion-row style="background:#54595f;"
+    v-for="cuClass in studentClasses"
+    :key="cuClass.id"
+    class="course-block"
+    @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
+  >
+        <ion-text style="margin: 5px 0px;">          
+          <span>{{ cuClass.startDateTime }}</span><br/>
+          <span>{{ cuClass.title }} </span>  
+          <span> ( {{ cuClass.courseNumber }} )</span>
+        </ion-text>
+      
+  </ion-row>
+</ion-grid> 
+
 <!-------------------------------------->
 
 <ion-grid v-if="isStudent != true">
@@ -74,8 +91,8 @@
     
          
 <!-------------------------------------->
-    <ion-button @click="switchRoll">
-    <ion-icon slot="start" :icon="gitCompareOutline"  @click="switchRoll"></ion-icon>
+    <ion-button @click="switchRole">
+    <ion-icon slot="start" :icon="gitCompareOutline"  @click="switchRole"></ion-icon>
     <span v-if="isStudent == true">student</span>
     <span v-if="isStudent != true">faculty</span>
     </ion-button>
@@ -101,6 +118,7 @@ export default {
   data() {
     return {
       classes: [],
+      studentClasses: [],
       currentDate: "",
       currentTime: "",
       chevronForward,
@@ -191,18 +209,93 @@ export default {
       }, 60000)
     },
 
-  switchRoll(){
+  switchRole(){
     this.isStudent = !this.isStudent;
-  }
+     var myToken = this.$store.getters.getToken;
+      console.log("token is "+myToken);
+      this.getRole();
+  },
+
+  getRole(){
+      const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 
+                  'Authorization': 'Bearer '+ this.$store.getters.getToken}
+      };
+      fetch('https://qa2-web.scansoftware.com/cafeweb/api/authenticate/whoAmI', requestOptions)
+        .then(async response => {
+          const data = await response.json();
+
+          // check for error response
+          if (!response.ok) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          console.log("isInstructor = " + data.isInstructor);
+          console.log("isStudent = " + data.isStudent);
+          if( data.isInstructor == false && data.isStudent == true) {
+            this.getStudentClasses();
+          } else if ( data.isInstructor == true && data.isStudent == false) {
+            this.getInstructorClasses();
+          }
 
 
+          //this.postId = data.id;
+        })
+        .catch(error => {
+          this.errorMessage = error;
+          console.error('There was an error!', error);
+          this.$router.push('/login');
+        });
+    },
+
+  // build student's class list 
+  getStudentClasses(){
+      var myToken = this.$store.getters.getToken;
+      console.log("token is "+myToken);
+      const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 
+                  'Authorization': 'Bearer '+ this.$store.getters.getToken}
+      };
+      fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/classes', requestOptions)
+        .then(async response => {
+          const data = await response.json();
+
+          // check for error response
+          if (!response.ok) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          console.log("classes = " + JSON.stringify(data.classes));
+          this.studentClasses =[];
+          this.studentClasses = data.classes;
+        })
+        .catch(error => {
+          this.errorMessage = error;
+          console.error('There was an error!', error);
+          this.$router.push('/login');
+        });
+  },
   
+  // build instructor's class list
+  getInstructorClasses(){
+
+  }
 
     //gotoPage(p) {
       //if (p==1) {router.push('/login');}
     //},
   },
   mounted: function () {
+    // check user token
+    // if work getRole
+    // else push to login
+    // get role
+    this.getRole();
+
     //update table display onload
     this.getClass();
     let today = new Date();
@@ -210,6 +303,7 @@ export default {
     this.getCurrentTime();
     this.updateTime();
     console.log("today is = " + this.currentDate);
+    console.log("classlistpage mounted");
   },
   computed:{
       loadUserID(){
@@ -220,6 +314,15 @@ export default {
            console.log(this.$store.state.classes);
             return this.$store.state.classes.legnth;
       }
+  },
+  beforeMount:function () {
+    console.log('classlistpage beforeMount');
+  },
+  Created:function () {
+    console.log('classlistpage Created');
+  },
+  Updated:function () {
+    console.log('classlistpage Updated');
   }
 };
 </script>

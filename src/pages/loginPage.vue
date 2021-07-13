@@ -11,6 +11,7 @@
             src="../../assets/campus.cafe.logo.png"
             style="padding: 40px 10px"
           ></ion-img>
+        <!--
         <ion-item>
           <ion-label>Select School</ion-label>
           <ion-select interface="action-sheet"
@@ -23,11 +24,14 @@
             <ion-select-option value="college">college</ion-select-option>
           </ion-select>
         </ion-item>
+        -->
         <ion-item>
-          <ion-input placeholder="User Name / email">joeey.fergusonn</ion-input>
+          <!--<ion-input placeholder="Email" v-model="userInfo.username">joeey.fergusonn</ion-input>-->
+          <ion-input placeholder="Email" v-model="userInfo.username"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-input placeholder="Password" type="password">660090023</ion-input>
+          <!--<ion-input placeholder="Password" type="password" v-model="userInfo.password">660090023</ion-input>-->
+          <ion-input placeholder="Password" type="password" v-model="userInfo.password"></ion-input>
         </ion-item>
         
       </ion-col>
@@ -45,9 +49,7 @@
 </base-layout>
 </template>
 <script>
-import { IonInput, IonItem,
-  IonSelect,
-  IonSelectOption } from "@ionic/vue";
+import { IonInput, IonItem} from "@ionic/vue";
 import { lockOpenOutline, timeOutline, alarmOutline } from "ionicons/icons";
 
 import { useRouter } from "vue-router";
@@ -55,7 +57,7 @@ import { IonImg } from "@ionic/vue";
 
 export default {
   name: "login",
-  components: { IonInput, IonItem, IonImg, IonSelect, IonSelectOption },
+  components: { IonInput, IonItem, IonImg },
   setup() {
     const router = useRouter();
     return { router };
@@ -68,6 +70,10 @@ export default {
       img: "../../assets/campus.cafe.logo.png",
       schools:[],
       school:'',
+      userInfo: {
+        username: "",
+        password: "",
+      },
     };
   },
   methods: {
@@ -92,8 +98,9 @@ export default {
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 
-                  'Authorization': 'Bearer xxtokenxx6'},
-        body: JSON.stringify({"username":"joeey.fergusonn","password":"660090023"})
+                  'Authorization': 'Bearer token'},
+        body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
+        //body: JSON.stringify({"username":"joeey.fergusonn","password":"660090023"})
       };
       fetch('https://qa2-web.scansoftware.com/cafeweb/api/authenticate/token', requestOptions)
         .then(async response => {
@@ -112,6 +119,7 @@ export default {
           console.log('school = ' + this.$store.getters.getSchool);
           this.$router.push('/classList');
           //this.postId = data.id;
+          //this.getClasses();
         })
         .catch(error => {
           this.errorMessage = error;
@@ -122,12 +130,15 @@ export default {
 
 
     getClasses(){
+      let myToken = this.$store.getters.getToken;
+
       const requestOptions = {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', 
-                  'Authorization': 'Bearer xxtokenxx16'}
+                  'Authorization': 'Bearer '+myToken}
       };
       fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/classes', requestOptions)
+      //fetch('https://qa2-web.scansoftware.com/cafeweb/api/authenticate/whoAmI', requestOptions)
         .then(async response => {
           const data = await response.json();
 
@@ -149,6 +160,9 @@ export default {
 
 
   },
-  mounted: function () {},
+  mounted: function () {
+    this.loadToken();
+    console.log('login page mounted');
+  },
 };
 </script>
