@@ -426,8 +426,13 @@ const store = createStore({
         },
         cuClass(state) {
             return (classID) => {
-                return state.classes.find((cuClass) => cuClass.classID === classID)
-            }
+                    return state.classes.find((cuClass) => cuClass.classID === classID)
+                }
+                /*
+                return (courseNumber) => {
+                    return state.classes.find((cuClass) => cuClass.courseNumber === courseNumber)
+                }
+                */
         },
         getToken(state) {
             return state.token;

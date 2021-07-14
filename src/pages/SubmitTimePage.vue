@@ -114,7 +114,14 @@ export default {
       this.InOutFlag = (this.$store.getters.cuClass(
         this.$route.params.id
       ).timeInOut.length % 2 == 0 )  ? true : false;
-
+      /*
+      this.ClassTitle = this.$store.getters.cuClass(
+        this.$route.params.id
+      ).title;
+      this.classStartTime = this.$store.getters.cuClass(
+        this.$route.params.id
+      ).startDateTime;
+      */
     },
 
     updateTime(){
@@ -130,6 +137,7 @@ export default {
     // on successful call openToastSuccessful
     // on faile call openToastFailed
     onSubmit(){
+      /*
       this.$store.getters.cuClass(
         this.$route.params.id
       ).timeInOut.push(this.currentTime);
@@ -137,8 +145,41 @@ export default {
       console.log(this.$store.getters.cuClass(
         this.$route.params.id
       ).timeInOut);
+      */
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 
+                  'Authorization': 'Bearer '+ this.$store.getters.getToken,                  
+                  }
+      };
 
-      this.openToastSuccessful();
+      var url = "https://qa2-web.scansoftware.com/cafeweb/api/student/classes?semester=" + this.$store.getters.cuClass(this.$route.params.id).semester
+                "&courseNumber=" + this.$route.params.id + 
+                "&courseSection=" + this.$store.getters.cuClass(this.$route.params.id).courseSection + 
+                "&labSection=" + this.$store.getters.cuClass(this.$route.params.id).labSection
+      fetch(url, requestOptions)
+        .then(async response => {
+         
+          this.openToastSuccessful();
+
+          // check for error response
+          if (!response.ok) {
+            this.openToastFailed();
+            // get error message from body or default to response status
+            //const error = (data && data.message) || response.status;
+            //return Promise.reject(error);
+          }
+
+          //this.postId = data.id;
+        })
+        .catch(error => {
+          this.errorMessage = error;
+          console.error('There was an error!', error);
+          this.openToastFailed();
+        });
+
+
+      
     },
 
     async openToastSuccessful() {

@@ -99,8 +99,9 @@ export default {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer token'},
-        body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
+        //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
         //body: JSON.stringify({"username":"joeey.fergusonn","password":"660090023"})
+        body: JSON.stringify({"username":"cmingus","password":"cmingus"})
       };
       fetch('https://qa2-web.scansoftware.com/cafeweb/api/authenticate/token', requestOptions)
         .then(async response => {

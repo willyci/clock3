@@ -119,6 +119,7 @@ export default {
     return {
       classes: [],
       studentClasses: [],
+      instructorClasses: [],
       currentDate: "",
       currentTime: "",
       chevronForward,
@@ -199,8 +200,10 @@ export default {
           this.$store.commit("addClasses",data.classes);
         });
       console.log("got data");
+      this.getRole();
       //this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
       //this.$store.commit("addUserID", this.userID?this.userID:"123");
+      
     },
 
     updateTime(){
@@ -234,9 +237,11 @@ export default {
           }
           console.log("isInstructor = " + data.isInstructor);
           console.log("isStudent = " + data.isStudent);
+          this.userName = data.firstName + " " + data.lastName;
+
           if( data.isInstructor == false && data.isStudent == true) {
             this.getStudentClasses();
-          } else if ( data.isInstructor == true && data.isStudent == false) {
+          } else if ( data.isInstructor == true){//} && data.isStudent == false) {
             this.getInstructorClasses();
           }
 
@@ -272,6 +277,7 @@ export default {
           console.log("classes = " + JSON.stringify(data.classes));
           this.studentClasses =[];
           this.studentClasses = data.classes;
+          //this.$store.commit("addClasses",data.classes);
         })
         .catch(error => {
           this.errorMessage = error;
@@ -282,7 +288,34 @@ export default {
   
   // build instructor's class list
   getInstructorClasses(){
+    ///cafeweb/api/instructor/classes
+    var myToken = this.$store.getters.getToken;
+      console.log("token is "+myToken);
+      const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 
+                  'Authorization': 'Bearer '+ this.$store.getters.getToken}
+      };
+      fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/classes', requestOptions)
+        .then(async response => {
+          const data = await response.json();
 
+          // check for error response
+          if (!response.ok) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          console.log("classes = " + JSON.stringify(data.classes));
+          this.instructorClasses =[];
+          this.instructorClasses = data.classes;
+          //this.$store.commit("addClasses",data.classes);
+        })
+        .catch(error => {
+          this.errorMessage = error;
+          console.error('There was an error!', error);
+          this.$router.push('/login');
+        });
   }
 
     //gotoPage(p) {
