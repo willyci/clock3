@@ -4,7 +4,8 @@
       <ion-row>
         <ion-col size="12" style="text-align: center">
           <!--<h4>Student Attendance</h4>-->
-          <h2 style="margin:0px;font-weight:bold;">{{ ClassTitle }} ({{ classID }})</h2>
+          <h2 style="margin:0px;font-weight:bold;">{{ ClassTitle }}</h2>
+          <h2 style="margin:0px;font-weight:bold;">({{ courseNumber }})</h2>
           <h4 style="margin:0px;">{{ currentDate }}</h4>
           <h4 style="margin:0px;">{{classStartTime}} - {{classEndTime}}</h4>
         </ion-col>
@@ -18,6 +19,7 @@
     </ion-grid>
 
     <ion-grid>
+      <!--
       <ion-row v-if="InOutFlag"><ion-col size="12" style="text-align: center">
           <h1 style="font-weight:bold;">Time IN</h1>
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
@@ -26,6 +28,7 @@
            <h1 style="font-weight:bold;">Time OUT</h1>
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
         </ion-col></ion-row>
+        -->
       <ion-row><ion-col size="12" style="text-align: center">
           <ion-button expand="block" @click="onSubmit" style="--background:#ff796a;">
             <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
@@ -51,6 +54,7 @@ export default {
       classID: this.$route.params.id,
       gotit: "",
       ClassTitle: "",
+      courseNumber:"",
       userName: "",
       logOutOutline,
       logInOutline,
@@ -99,6 +103,7 @@ export default {
     },
 
     getClassTitle() {
+      /*
       this.ClassTitle = this.$store.getters.cuClass(
         this.$route.params.id
       ).ClassTitle;
@@ -114,14 +119,27 @@ export default {
       this.InOutFlag = (this.$store.getters.cuClass(
         this.$route.params.id
       ).timeInOut.length % 2 == 0 )  ? true : false;
-      /*
+      */
+     console.log("id="+this.$route.params.id);
+     console.log("class="+JSON.stringify(this.$store.getters.getClasses));
+     console.log(JSON.stringify(this.$store.getters.cuClass(
+        this.$route.params.id
+      )));
       this.ClassTitle = this.$store.getters.cuClass(
         this.$route.params.id
       ).title;
       this.classStartTime = this.$store.getters.cuClass(
         this.$route.params.id
       ).startDateTime;
-      */
+      this.classEndTime = this.$store.getters.cuClass(
+        this.$route.params.id
+      ).endDateTime;
+      this.courseNumber = this.$route.params.id;
+      console.log("title="+this.ClassTitle);
+      this.classStartTime = this.$store.getters.cuClass(
+        this.$route.params.id
+      ).startDateTime;
+      
     },
 
     updateTime(){
@@ -153,7 +171,7 @@ export default {
                   }
       };
 
-      var url = "https://qa2-web.scansoftware.com/cafeweb/api/student/classes?semester=" + this.$store.getters.cuClass(this.$route.params.id).semester
+      var url = "https://qa2-web.scansoftware.com/cafeweb/api/student/clockIn?semester=" + this.$store.getters.cuClass(this.$route.params.id).semester +
                 "&courseNumber=" + this.$route.params.id + 
                 "&courseSection=" + this.$store.getters.cuClass(this.$route.params.id).courseSection + 
                 "&labSection=" + this.$store.getters.cuClass(this.$route.params.id).labSection
@@ -191,9 +209,11 @@ export default {
           color: 'success'
         })
       toast.present();
+      
       toast.onDidDismiss().then(()=>{
         this.$router.go(-1);
       })
+      
     },
     
 
@@ -202,7 +222,7 @@ export default {
         .create({
           message: 'Failed submit, server error, please try again.',
           position: 'top',
-          duration: 1000,
+          duration: 2000,
           color: 'danger'
         })
       toast.present();

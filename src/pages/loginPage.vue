@@ -55,6 +55,8 @@ import { lockOpenOutline, timeOutline, alarmOutline } from "ionicons/icons";
 import { useRouter } from "vue-router";
 import { IonImg } from "@ionic/vue";
 
+//import { Storage } from '@ionic/storage';
+
 export default {
   name: "login",
   components: { IonInput, IonItem, IonImg },
@@ -85,7 +87,9 @@ export default {
     //    not working, stay
     // no token stay
     loadToken(){
+    },
 
+    createStorage() {
     },
     // get list of schools
     // build select dropdown
@@ -100,8 +104,8 @@ export default {
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer token'},
         //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
-        //body: JSON.stringify({"username":"joeey.fergusonn","password":"660090023"})
-        body: JSON.stringify({"username":"cmingus","password":"cmingus"})
+        body: JSON.stringify({"username":"joeey.fergusonn","password":"660090023"})
+        //body: JSON.stringify({"username":"cmingus","password":"cmingus"})
       };
       fetch('https://qa2-web.scansoftware.com/cafeweb/api/authenticate/token', requestOptions)
         .then(async response => {
@@ -113,11 +117,11 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log(data.token);
+          //console.log(data.token);
           this.$store.commit("addToken",data.token);
-          this.$store.commit("addSchool",this.school);
+          //this.$store.commit("addSchool",this.school);
           console.log("saved to state "+this.$store.getters.getToken);
-          console.log('school = ' + this.$store.getters.getSchool);
+          //console.log('school = ' + this.$store.getters.getSchool);
           this.$router.push('/classList');
           //this.postId = data.id;
           //this.getClasses();

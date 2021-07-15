@@ -75,7 +75,7 @@ export default {
   },
   methods:{
     reload() {
-      this.$parent.getClass();
+      this.$parent.getRole();
     }
   },
 };

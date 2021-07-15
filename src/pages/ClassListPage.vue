@@ -11,7 +11,7 @@
           <h2 style="margin:0px;">Today</h2>
           <h2 style="margin:0px;font-weight:bold;">{{ currentDate }}</h2>
           <h2 style="margin:0px;font-weight:bold;padding-bottom:40px;">{{ currentTime}}</h2>
-          
+          <h2 style="margin:0px;font-weight:bold;padding-bottom:40px;color:red;" v-if="!hasClass">No class found</h2>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -91,7 +91,7 @@
     
          
 <!-------------------------------------->
-    <ion-button @click="switchRole">
+    <ion-button @click="switchRole" v-if="1==0">
     <ion-icon slot="start" :icon="gitCompareOutline"  @click="switchRole"></ion-icon>
     <span v-if="isStudent == true">student</span>
     <span v-if="isStudent != true">faculty</span>
@@ -131,6 +131,7 @@ export default {
       userRole: "",
       userID: "",
       isStudent : true,
+      hasClass : false,
     };
   },
   setup() {
@@ -197,7 +198,7 @@ export default {
           this.userName = data.name;
           this.userID = data.id;
           this.$store.commit("addUserID",data.id);
-          this.$store.commit("addClasses",data.classes);
+          //this.$store.commit("addClasses",data.classes);
         });
       console.log("got data");
       this.getRole();
@@ -275,14 +276,19 @@ export default {
             return Promise.reject(error);
           }
           console.log("classes = " + JSON.stringify(data.classes));
+          //console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
           this.studentClasses =[];
           this.studentClasses = data.classes;
-          //this.$store.commit("addClasses",data.classes);
+          this.$store.commit("addClasses",data.classes);
+
+          console.log("class count = "+ this.studentClasses.length);
+          if(this.studentClasses.length >=1 ) {this.hasClass = true;}
+          else {this.hasClass = false;}
         })
         .catch(error => {
           this.errorMessage = error;
           console.error('There was an error!', error);
-          this.$router.push('/login');
+          //this.$router.push('/login');
         });
   },
   
@@ -306,15 +312,18 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log("classes = " + JSON.stringify(data.classes));
+          console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
           this.instructorClasses =[];
           this.instructorClasses = data.classes;
           //this.$store.commit("addClasses",data.classes);
+
+          if(this.studentClasses.length > 0) {this.hasClass = true;}
+          else {this.hasClass = false;}
         })
         .catch(error => {
           this.errorMessage = error;
           console.error('There was an error!', error);
-          this.$router.push('/login');
+          //this.$router.push('/login');
         });
   }
 
@@ -330,7 +339,7 @@ export default {
     this.getRole();
 
     //update table display onload
-    this.getClass();
+    //this.getClass();
     let today = new Date();
     this.currentDate = today.toDateString();
     this.getCurrentTime();
