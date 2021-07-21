@@ -87,9 +87,13 @@ export default {
     //    not working, stay
     // no token stay
     loadToken(){
+        var token = localStorage.getItem('token');
+        console.log(token);
     },
 
     createStorage() {
+        //var currStorage = window.localStorage;
+        localStorage.setItem('token', this.$store.getters.getToken)
     },
     // get list of schools
     // build select dropdown
@@ -104,8 +108,10 @@ export default {
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer token'},
         //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
-        body: JSON.stringify({"username":"joeey.fergusonn","password":"660090023"})
-        //body: JSON.stringify({"username":"cmingus","password":"cmingus"})
+        body: JSON.stringify({"username":"instructor2","password":"instructor2"})
+        //body: JSON.stringify({"username":"student2","password":"student2"})
+        //body: JSON.stringify({"username":"student3","password":"student3"})
+
       };
       fetch('https://qa2-web.scansoftware.com/cafeweb/api/authenticate/token', requestOptions)
         .then(async response => {
@@ -122,6 +128,7 @@ export default {
           //this.$store.commit("addSchool",this.school);
           console.log("saved to state "+this.$store.getters.getToken);
           //console.log('school = ' + this.$store.getters.getSchool);
+          this.createStorage();
           this.$router.push('/classList');
           //this.postId = data.id;
           //this.getClasses();
@@ -132,8 +139,7 @@ export default {
         });
     },
 
-
-
+/*
     getClasses(){
       let myToken = this.$store.getters.getToken;
 
@@ -161,7 +167,7 @@ export default {
           console.error('There was an error!', error);
         });
     },
-
+*/
 
 
   },

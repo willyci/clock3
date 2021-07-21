@@ -73,15 +73,15 @@
 
 <ion-grid v-if="isStudent != true">
   <ion-row style="background:#54595f;"
-    v-for="cuClass in classes"
-    :key="cuClass.id"
+    v-for="cuInsClass in instructorClasses"
+    :key="cuInsClass.id"
     class="course-block"
-    @click="router.push(`/studentList/${cuClass.classID}`)"
+    @click="router.push(`/studentList/${cuInsClass.classID}`)"
   >
         <ion-text style="margin: 5px 0px;">          
-          <span>{{ cuClass.classStartTime }}</span><br/>
-          <span>{{ cuClass.ClassTitle }}</span> 
-          <span> ( {{ cuClass.classID }} )</span>
+          <span>{{ cuInsClass.classStartTime }}</span><br/>
+          <span>{{ cuInsClass.ClassTitle }}</span> 
+          <span> ( {{ cuInsClass.classID }} )</span>
         </ion-text>
       
   </ion-row>
@@ -221,10 +221,12 @@ export default {
   },
 
   getRole(){
+      var token = this.$store.getters.getToken;
+      
       const requestOptions = {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', 
-                  'Authorization': 'Bearer '+ this.$store.getters.getToken}
+                  'Authorization': 'Bearer '+ token}
       };
       fetch('https://qa2-web.scansoftware.com/cafeweb/api/authenticate/whoAmI', requestOptions)
         .then(async response => {
@@ -242,7 +244,10 @@ export default {
 
           if( data.isInstructor == false && data.isStudent == true) {
             this.getStudentClasses();
-          } else if ( data.isInstructor == true){//} && data.isStudent == false) {
+          } else if ( data.isInstructor == true && data.isStudent == false){//} && data.isStudent == false) {
+            this.getInstructorClasses();
+          } else if ( data.isInstructor == true && data.isStudent == true){//} && data.isStudent == false) {
+            this.getStudentClasses();
             this.getInstructorClasses();
           }
 
@@ -278,10 +283,11 @@ export default {
           console.log("classes = " + JSON.stringify(data.classes));
           //console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
           this.studentClasses =[];
-          this.studentClasses = data.classes;
-          this.$store.commit("addClasses",data.classes);
+          this.studentClasses = this.cleanupTime(data.classes);
+          //console.log("new classes = " + JSON.stringify(this.studentClasses));
+          this.$store.commit("addClasses", this.studentClasses);
 
-          console.log("class count = "+ this.studentClasses.length);
+          //console.log("class count = "+ this.studentClasses.length);
           if(this.studentClasses.length >=1 ) {this.hasClass = true;}
           else {this.hasClass = false;}
         })
@@ -302,7 +308,7 @@ export default {
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer '+ this.$store.getters.getToken}
       };
-      fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/classes', requestOptions)
+      fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/classes?date=20210720', requestOptions)
         .then(async response => {
           const data = await response.json();
 
@@ -312,11 +318,10 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
+          //console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
           this.instructorClasses =[];
           this.instructorClasses = data.classes;
-          //this.$store.commit("addClasses",data.classes);
-
+          this.$store.commit("addInsClasses",data.classes);
           if(this.studentClasses.length > 0) {this.hasClass = true;}
           else {this.hasClass = false;}
         })
@@ -325,7 +330,35 @@ export default {
           console.error('There was an error!', error);
           //this.$router.push('/login');
         });
+  },
+
+
+  // remove date, time only
+  cleanupTime(classes){
+    if(classes.length>=1){
+      for(var i = 0 ; i< classes.length; i++){
+        classes[i].startDateTime = this.changeTimeTo12(classes[i].startDateTime);
+        classes[i].endDateTime = this.changeTimeTo12(classes[i].endDateTime);
+      }
+    }
+
+    return classes;
+  },
+
+  // change to 12hr AMPM
+  changeTimeTo12(time){
+    var hh = time.split('T')[1].split(":")[0];
+    var mm = time.split('T')[1].split(":")[1];
+    var AMPM = " AM";
+    if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
+    else if (hh <= 11) {AMPM = " AM";}
+    else if (hh == 12) {AMPM = " PM";}    
+    else if (hh > 12) {AMPM = " PM"; hh -=12;}
+
+    //console.log(hh+":"+mm+AMPM);
+    return hh+":"+mm+AMPM;
   }
+
 
     //gotoPage(p) {
       //if (p==1) {router.push('/login');}
@@ -346,6 +379,10 @@ export default {
     this.updateTime();
     console.log("today is = " + this.currentDate);
     console.log("classlistpage mounted");
+    
+    var token = localStorage.getItem('token');
+    console.log("localstorage token="+token);
+
   },
   computed:{
       loadUserID(){
@@ -358,14 +395,24 @@ export default {
       }
   },
   beforeMount:function () {
-    console.log('classlistpage beforeMount');
+    console.log('--classlistpage beforeMount');
   },
   Created:function () {
-    console.log('classlistpage Created');
+    console.log('--classlistpage Created');
+    //this.$root.$refs.ClassListPage = this;
   },
   Updated:function () {
-    console.log('classlistpage Updated');
-  }
+    console.log('--classlistpage Updated');
+  },
+  onUpdated:function () {
+    console.log('--onUpdated Updated');
+  },
+  watch:{
+     $route (to, from){
+        console.log(to);
+        console.log(from);
+    }
+  },
 };
 </script>
 

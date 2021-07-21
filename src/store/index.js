@@ -23,6 +23,7 @@ const store = createStore({
                 },
             ],
             classes: [],
+            insClasses: [],
             tesmpClasses: [{
                     "id": 1,
                     "classID": "154",
@@ -362,6 +363,10 @@ const store = createStore({
             state.classes = classes;
         },
 
+        addInsClasses(state, insClasses) {
+            state.insClasses = insClasses;
+        },
+
         addToken(state, token) {
             state.token = token;
         },
@@ -388,6 +393,9 @@ const store = createStore({
         },
         addClasses(context, classes) {
             context.commit('addClasses', classes);
+        },
+        addInsClasses(context, insClasses) {
+            context.commit('addInsClasses', insClasses);
         },
         addToken(context, token) {
             context.commit('addToken', token);
@@ -423,6 +431,9 @@ const store = createStore({
         },
         getClasses(state) {
             return state.classes;
+        },
+        getInsClasses(state) {
+            return state.insClasses;
         },
         cuClass(state) {
             /*

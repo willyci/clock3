@@ -19,7 +19,7 @@
     </ion-grid>
 
     <ion-grid>
-      <!--
+      
       <ion-row v-if="InOutFlag"><ion-col size="12" style="text-align: center">
           <h1 style="font-weight:bold;">Time IN</h1>
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
@@ -28,7 +28,7 @@
            <h1 style="font-weight:bold;">Time OUT</h1>
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
         </ion-col></ion-row>
-        -->
+        
       <ion-row><ion-col size="12" style="text-align: center">
           <ion-button expand="block" @click="onSubmit" style="--background:#ff796a;">
             <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
@@ -62,6 +62,8 @@ export default {
       classStartTime: "",
       classEndTime: "",
       InOutFlag: true,
+      clockId: "",
+      submitClockId:"",
     };
   },
   computed: {},
@@ -118,8 +120,27 @@ export default {
       
       this.InOutFlag = (this.$store.getters.cuClass(
         this.$route.params.id
-      ).timeInOut.length % 2 == 0 )  ? true : false;
+      ).clockHistory.length % 2 == 0 )  ? true : false;
       */
+
+      // get clock history
+      var ch=[];
+      ch = this.$store.getters.cuClass(
+        this.$route.params.id
+      ).clockHistory;
+
+      // no history
+      if(ch.length == 0) { this.InOutFlag = true;  this.submitClockId="clockIn?";}
+      else { 
+        // find last obj, 
+        // if has studentClockOutDateTime, new in time
+        // else it is out time, add clock id on submit
+        //var lastTimeStemp = ch[ch.lenght-1]; 
+        if(ch[ch.length-1].studentClockOutDateTime != null) { this.InOutFlag = true; this.submitClockId="clockIn?";} 
+        else { this.InOutFlag = false; this.clockId = ch[ch.length-1].clockId; this.submitClockId= "clockOut?clockId="+this.clockId+"&";}
+        }
+
+
      console.log("id="+this.$route.params.id);
      console.log("class="+JSON.stringify(this.$store.getters.getClasses));
      console.log(JSON.stringify(this.$store.getters.cuClass(
@@ -171,33 +192,27 @@ export default {
                   }
       };
 
-      var url = "https://qa2-web.scansoftware.com/cafeweb/api/student/clockIn?semester=" + this.$store.getters.cuClass(this.$route.params.id).semester +
+      var url = "https://qa2-web.scansoftware.com/cafeweb/api/student/"+ 
+                this.submitClockId +
+                "semester=" + this.$store.getters.cuClass(this.$route.params.id).semester +                
                 "&courseNumber=" + this.$route.params.id + 
                 "&courseSection=" + this.$store.getters.cuClass(this.$route.params.id).courseSection + 
                 "&labSection=" + this.$store.getters.cuClass(this.$route.params.id).labSection
       fetch(url, requestOptions)
         .then(async response => {
-         
-          this.openToastSuccessful();
-
           // check for error response
           if (!response.ok) {
             this.openToastFailed();
-            // get error message from body or default to response status
-            //const error = (data && data.message) || response.status;
-            //return Promise.reject(error);
+          } else {
+            this.openToastSuccessful();
           }
 
-          //this.postId = data.id;
         })
         .catch(error => {
           this.errorMessage = error;
           console.error('There was an error!', error);
           this.openToastFailed();
         });
-
-
-      
     },
 
     async openToastSuccessful() {
@@ -211,6 +226,7 @@ export default {
       toast.present();
       
       toast.onDidDismiss().then(()=>{
+        //this.$root.$refs.ClassListPage.getRole();
         this.$router.go(-1);
       })
       
@@ -222,7 +238,7 @@ export default {
         .create({
           message: 'Failed submit, server error, please try again.',
           position: 'top',
-          duration: 2000,
+          duration: 3000,
           color: 'danger'
         })
       toast.present();
