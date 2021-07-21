@@ -70,18 +70,16 @@
 </ion-grid> 
 
 <!-------------------------------------->
-
 <ion-grid v-if="isStudent != true">
   <ion-row style="background:#54595f;"
     v-for="cuInsClass in instructorClasses"
-    :key="cuInsClass.id"
+    :key="cuInsClass.courseNumber"
     class="course-block"
-    @click="router.push(`/studentList/${cuInsClass.classID}`)"
   >
         <ion-text style="margin: 5px 0px;">          
-          <span>{{ cuInsClass.classStartTime }}</span><br/>
-          <span>{{ cuInsClass.ClassTitle }}</span> 
-          <span> ( {{ cuInsClass.classID }} )</span>
+          <span>{{ changeTimeTo12(cuInsClass.startDateTime) }}</span><br/>
+          <span>{{ cuInsClass.title }}</span> 
+          <span> ( {{ cuInsClass.courseNumber }} )</span>
         </ion-text>
       
   </ion-row>
@@ -131,6 +129,7 @@ export default {
       userRole: "",
       userID: "",
       isStudent : true,
+      isInstructor : false,
       hasClass : false,
     };
   },
@@ -164,6 +163,17 @@ export default {
         " " +
         ampm;
       return today;
+    },
+
+    getTodayDay(){
+      var today = new Date();
+      var yyyy = today.getFullYear().toString();
+      var mm = today.getMonth()+1;
+      if(mm<10) { mm = "0" + mm.toString();}
+      var dd = today.getDate();
+      if(dd<10) { dd = "0" + dd.toString();}
+      today.getDate();
+      return yyyy+mm+dd;
     },
 
     getCurrentTime(){
@@ -241,12 +251,14 @@ export default {
           console.log("isInstructor = " + data.isInstructor);
           console.log("isStudent = " + data.isStudent);
           this.userName = data.firstName + " " + data.lastName;
+          this.isStudent = data.isStudent;
+          this.isInstructor = data.isInstructor;
 
           if( data.isInstructor == false && data.isStudent == true) {
             this.getStudentClasses();
-          } else if ( data.isInstructor == true && data.isStudent == false){//} && data.isStudent == false) {
+          } else if ( data.isInstructor == true && data.isStudent == false){
             this.getInstructorClasses();
-          } else if ( data.isInstructor == true && data.isStudent == true){//} && data.isStudent == false) {
+          } else if ( data.isInstructor == true && data.isStudent == true){
             this.getStudentClasses();
             this.getInstructorClasses();
           }
@@ -308,7 +320,7 @@ export default {
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer '+ this.$store.getters.getToken}
       };
-      fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/classes?date=20210720', requestOptions)
+      fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/classes?date='+this.getTodayDay(), requestOptions)
         .then(async response => {
           const data = await response.json();
 
@@ -318,11 +330,12 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          //console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
+          console.log("ins classes = " + JSON.stringify(data.classes));
           this.instructorClasses =[];
           this.instructorClasses = data.classes;
           this.$store.commit("addInsClasses",data.classes);
-          if(this.studentClasses.length > 0) {this.hasClass = true;}
+          console.log("instructor has class = "+this.instructorClasses.length + this.isStudent);
+          if(this.instructorClasses.length > 0) {this.hasClass = true;}
           else {this.hasClass = false;}
         })
         .catch(error => {
