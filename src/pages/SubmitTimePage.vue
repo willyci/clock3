@@ -186,7 +186,7 @@ export default {
       ).timeInOut);
       */
       const requestOptions = {
-        method: 'POST',
+        method: (this.submitClockId.length>8)?"PUT":"POST",
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer '+ this.$store.getters.getToken,                  
                   }

@@ -8,7 +8,8 @@
           ></ion-back-button>
         </ion-buttons>
         <ion-buttons slot="start" v-if="pageDefaultBackLink == 'login'">
-          <ion-button id="changeText" @click="() => router.push('/login')">
+          <!--<ion-button id="changeText" @click="() => router.push('/login')">-->
+            <ion-button id="changeText" @click="logout()">
             <ion-icon slot="start" :icon="lockClosedOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -76,6 +77,12 @@ export default {
   methods:{
     reload() {
       this.$parent.getRole();
+    },
+    logout() {
+      this.$store.commit("addToken","");
+      //this.$store.commit("addSchool",this.school);
+      console.log("delete token -"+this.$store.getters.getToken+"-.");
+      this.router.push('/login')
     }
   },
 };
