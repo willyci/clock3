@@ -10,8 +10,8 @@
           <h2 style="font-weight:bold;">{{ userName }}</h2>
           <h2 style="margin:0px;">Today</h2>
           <h2 style="margin:0px;font-weight:bold;">{{ currentDate }}</h2>
-          <h2 style="margin:0px;font-weight:bold;padding-bottom:40px;">{{ currentTime}}</h2>
-          <h2 style="margin:0px;font-weight:bold;padding-bottom:40px;color:red;" v-if="!hasClass">No class found</h2>
+          <h2 style="margin:0px;font-weight:bold;padding-bottom:10px;">{{ currentTime}}</h2>
+          <h2 style="margin:0px;font-weight:bold;padding-bottom:10px;color:red;" v-if="!hasClass">No class found</h2>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -36,7 +36,7 @@
   </ion-row>
 </ion-grid>  
 -->
-<!-------------------------------------->
+<!------------------------------------
 <ion-grid v-if="isStudent == true">
   <ion-row style="background:#54595f;"
     v-for="cuClass in classes"
@@ -52,21 +52,35 @@
       
   </ion-row>
 </ion-grid> 
-
+-->
 <ion-grid v-if="isStudent == true">
-  <ion-row style="background:#54595f;"
-    v-for="cuClass in studentClasses"
-    :key="cuClass.id"
-    class="course-block"
-    @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
-  >
-        <ion-text style="margin: 5px 0px;">          
-          <span>{{ cuClass.startDateTime }}</span><br/>
-          <span>{{ cuClass.title }} </span>  
-          <span> ( {{ cuClass.courseNumber }} )</span>
-        </ion-text>
-      
-  </ion-row>
+  
+  <div v-for="cuClass in studentClasses"
+      :key="cuClass.id">
+
+    <ion-row style="background:#54595f;"   v-if="cuClass.activeForClockInOut=='Y'"   
+      class="course-block"
+      @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
+    >
+          <ion-text style="margin: 5px 0px;">          
+            <span>{{ changeTimeTo12(cuClass.start) }}</span><br/>
+            <span>{{ cuClass.title }} </span>  
+            <span> ( {{ cuClass.courseNumber }} )</span>
+            <!--<br/><span>{{cuClass.activeForClockInOut}}</span>-->
+          </ion-text>        
+    </ion-row>
+
+    <ion-row style="background:#bebaba;"   v-if="cuClass.activeForClockInOut!='Y'"   
+      class="course-block"
+    >
+          <ion-text style="margin: 5px 0px;">          
+            <span>{{ changeTimeTo12(cuClass.start) }}</span><br/>
+            <span>{{ cuClass.title }} </span>  
+            <span> ( {{ cuClass.courseNumber }} )</span>
+          </ion-text>        
+    </ion-row>
+  </div>
+
 </ion-grid> 
 
 <!-------------------------------------->
@@ -283,7 +297,8 @@ export default {
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer '+ this.$store.getters.getToken}
       };
-      fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/classes', requestOptions)
+      fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/schedule?dateFilter=D', requestOptions)
+      //fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/schedule', requestOptions)
         .then(async response => {
           const data = await response.json();
 
@@ -293,10 +308,10 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log("classes = " + JSON.stringify(data.classes));
+          console.log("classes = " + JSON.stringify(data.events));
           //console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
           this.studentClasses =[];
-          this.studentClasses = this.cleanupTime(data.classes);
+          this.studentClasses = data.events;
           //console.log("new classes = " + JSON.stringify(this.studentClasses));
           this.$store.commit("addClasses", this.studentClasses);
 
