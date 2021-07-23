@@ -22,7 +22,12 @@
             <ion-icon slot="end" :icon="refreshOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-buttons slot="end" v-if="pageDefaultBackLink != 'login'">
+        <ion-buttons slot="end" v-if="pageDefaultBackLink == 'classList'">
+          <ion-button id="changeText" @click="reloadStident()">
+            <ion-icon slot="end" :icon="refreshOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end" v-if="pageDefaultBackLink != 'login' && pageDefaultBackLink != 'classList' ">
           <ion-button id="changeText" >
             <span> </span>
           </ion-button>
@@ -77,6 +82,9 @@ export default {
   methods:{
     reload() {
       this.$parent.getRole();
+    },
+    reloadStident() {
+      this.$parent.getStudents();
     },
     logout() {
       this.$store.commit("addToken","");

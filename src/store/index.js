@@ -436,13 +436,14 @@ const store = createStore({
             return state.insClasses;
         },
         cuClass(state) {
-            /*
-            return (classID) => {
-                    return state.classes.find((cuClass) => cuClass.classID === classID)
-                }
-                */
             return (courseNumber) => {
                 return state.classes.find((cuClass) => cuClass.courseNumber === courseNumber)
+            }
+
+        },
+        cuInsClass(state) {
+            return (courseNumber) => {
+                return state.insClasses.find((cuInsClass) => cuInsClass.courseNumber === courseNumber)
             }
 
         },

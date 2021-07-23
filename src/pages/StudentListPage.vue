@@ -19,7 +19,7 @@
 
     <ion-list>
         <ion-item 
-            v-for="student in students" 
+            v-for="student in studentList" 
             :key="student.studentID"
             ><ion-grid>
             <ion-row ion-no-padding>
@@ -28,18 +28,23 @@
             
           ></ion-img></div></ion-col>
                 <ion-col size="10">
-                    <div><span style="font-weight:bold;">{{student.studentFirstName}} {{student.studentLastName}} </span></div>
-                    <ion-row style="align-content: flex-start;" v-if="student.isPresent"
-                    @click="router.push(`/editTimes/${classID}/${student.studentID}`)"
+                    <div><span style="font-weight:bold;">{{student.firstName}} {{student.lastName}} </span></div>
+                    <ion-row style="align-content: flex-start;" 
+                    @click="router.push(`/editTimes/${classID}/${student.studentId}`)"
+                     v-for="time in student.clockHistory" :key="time.studentID"
                     >
-                    
-
-                        <ion-col size="6" v-for="time in student.timeInOut" :key="time.studentID"><div>{{time}}</div></ion-col>                       
+                            <ion-col size="4" v-if="student.clockHistory.length > 0">
+                                <div>{{this.changeTimeTo12(time.studentClockInDateTime)}}</div>
+                            </ion-col>
+                            <ion-col size="4" v-if="student.clockHistory.length > 0">
+                                <div>{{this.changeTimeTo12(time.studentClockOutDateTime)}}</div>
+                            </ion-col>
+                        
                     </ion-row>
-                    <ion-row style="align-content: flex-start;" v-if="!student.isPresent"
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.isAbsent == 'Y'"
                     @click="router.push(`/editTimes/${classID}/${student.studentID}`)"
                     >
-                        <ion-col size="12"><span style="color:red;">None</span></ion-col>
+                        <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
                     </ion-row>
                 </ion-col>
             </ion-row>    
@@ -80,6 +85,7 @@ export default {
         return {
             classes:[],
             students:[],
+            studentList: [],
             currentDate : '',
             msg:'hi',
             userName: '',
@@ -128,9 +134,19 @@ export default {
                 console.log("current time is "+ time.toString());
                 this.currentTime = time;
                 },
+            getTodayDay(){
+                var today = new Date();
+                var yyyy = today.getFullYear().toString();
+                var mm = today.getMonth()+1;
+                if(mm<10) { mm = "0" + mm.toString();}
+                var dd = today.getDate();
+                if(dd<10) { dd = "0" + dd.toString();}
+                today.getDate();
+                return yyyy+mm+dd;
+            },
 
         getStudents(){
-            this.students = this.$store.getters.cuClass(this.$route.params.id).students;  
+            /*this.students = this.$store.getters.cuClass(this.$route.params.id).students;  
             console.log(this.students);   
             this.classID  = this.$store.getters.cuClass(this.$route.params.id).classID;   
             this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
@@ -140,6 +156,46 @@ export default {
             this.classEndTime = this.$store.getters.cuClass(
                 this.$route.params.id
             ).classEndTime;
+            */
+            //var token = this.$store.getters.getToken;
+            //console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
+
+            const requestOptions = {
+                method: "GET",
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken,                  
+                         }
+            };
+
+            var url = "https://qa2-web.scansoftware.com/cafeweb/api/instructor/classClockTimes?"+ 
+                        "date=" + this.getTodayDay() +
+                        "&semester=" + this.$store.getters.cuInsClass(this.$route.params.id).semester +                
+                        "&courseNumber=" + this.$route.params.id + 
+                        "&courseSection=" + this.$store.getters.cuInsClass(this.$route.params.id).courseSection + 
+                        "&labSection=" + this.$store.getters.cuInsClass(this.$route.params.id).labSection
+            fetch(url, requestOptions)
+                .then(async response => {
+                    const data = await response.json();
+                    // check for error response
+                    if (!response.ok) {
+                        this.openToastFailed();
+                    } else {
+                        //this.openToastSuccessful();
+                        console.log("studnet list = "+JSON.stringify(data));
+                        console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
+
+                        this.ClassTitle = this.$store.getters.cuInsClass(this.$route.params.id).title;
+                        this.classID = this.$store.getters.cuInsClass(this.$route.params.id).courseNumber;
+                        this.classStartTime = this.changeTimeTo12(this.$store.getters.cuInsClass(this.$route.params.id).startDateTime);
+                        this.classEndTime = this.changeTimeTo12(this.$store.getters.cuInsClass(this.$route.params.id).endDateTime);
+                        this.studentList = data.students;
+                    }
+                })
+                .catch(error => {
+                this.errorMessage = error;
+                console.error('There was an error!', error);
+                this.openToastFailed();
+                }); 
         },
 
         onSubmit(){
@@ -163,12 +219,28 @@ export default {
             async openToastFailed() {
             const toast = await toastController
                 .create({
-                message: 'Failed submit, server error, please try again.',
+                message: 'Failed get student list, server error, please try again.',
                 position: 'top',
                 duration: 1000,
                 color: 'danger'
                 })
             toast.present();
+            },
+              // change to 12hr AMPM
+            changeTimeTo12(time) {
+                if( time == null || time == undefined || time == "") {return "";}
+                else {
+                    var hh = time.split('T')[1].split(":")[0];
+                    var mm = time.split('T')[1].split(":")[1];
+                    var AMPM = " AM";
+                    if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
+                    else if (hh <= 11) {AMPM = " AM";}
+                    else if (hh == 12) {AMPM = " PM";}    
+                    else if (hh > 12) {AMPM = " PM"; hh -=12;}
+
+                    //console.log(hh+":"+mm+AMPM);
+                    return hh+":"+mm+AMPM;
+                }
             },
     },
     mounted: function () {

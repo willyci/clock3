@@ -9,7 +9,7 @@
         
           <ion-img
             src="../../assets/campus.cafe.logo.png"
-            style="padding: 40px 10px"
+            style="padding: 40px 40px"
           ></ion-img>
         <!--
         <ion-item>
@@ -25,6 +25,7 @@
           </ion-select>
         </ion-item>
         -->
+          <h3 style="color:red;" v-if="loginError == true">Incorrect email or password!</h3>        
         <ion-item>
           <!--<ion-input placeholder="Email" v-model="userInfo.username">joeey.fergusonn</ion-input>-->
           <ion-input placeholder="Email" v-model="userInfo.username"></ion-input>
@@ -38,7 +39,7 @@
     </ion-row>
   </ion-grid>
   <ion-row
-    ><ion-col size="12">
+    ><ion-col size="12" style="text-align: center">
       <!--<ion-button expand="block" @click="() => router.push('/classList')">-->
         <ion-button expand="block" @click="loginSubmit()" style="--background:#ff796a;">
         <ion-icon slot="start" :icon="lockOpenOutline"></ion-icon>
@@ -72,6 +73,7 @@ export default {
       img: "../../assets/campus.cafe.logo.png",
       schools:[],
       school:'',
+      loginError: false,
       userInfo: {
         username: "",
         password: "",
@@ -136,6 +138,7 @@ export default {
         .catch(error => {
           this.errorMessage = error;
           console.error('There was an error!', error);
+          this.loginError = true;
         });
     },
 
