@@ -7,7 +7,7 @@
       <ion-row>
         <ion-col size="12" style="text-align: center">          
           <!--<h4>Class Schedule</h4>-->
-          <h2 style="font-weight:bold;">{{ userName }}</h2>
+          <h2 style="font-weight:bold;">{{userName}}</h2>
           <h2 style="margin:0px;">Today</h2>
           <h2 style="margin:0px;font-weight:bold;">{{ currentDate }}</h2>
           <h2 style="margin:0px;font-weight:bold;padding-bottom:10px;">{{ currentTime}}</h2>
@@ -63,7 +63,12 @@
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
           <ion-text style="margin: 5px 0px;">          
-            <span>{{ changeTimeTo12(cuClass.start) }}</span><br/>
+            <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span>
+            <span v-if="cuClass.clockHistory.length>0" style="float: right;font-size:12px;">
+            <span>{{changeTimeTo12((cuClass.clockHistory)[0].studentClockInDateTime)}} - </span>
+            <span>{{changeTimeTo12((cuClass.clockHistory)[0].studentClockOutDateTime)}}</span>
+            </span>
+            <br/>
             <span>{{ cuClass.title }} </span>  
             <span> ( {{ cuClass.courseNumber }} )</span>
             <!--<br/><span>{{cuClass.activeForClockInOut}}</span>-->
@@ -72,9 +77,10 @@
 
     <ion-row style="background:#bebaba;"   v-if="cuClass.activeForClockInOut!='Y'"   
       class="course-block"
+      @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
           <ion-text style="margin: 5px 0px;">          
-            <span>{{ changeTimeTo12(cuClass.start) }}</span><br/>
+            <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
             <span>{{ cuClass.title }} </span>  
             <span> ( {{ cuClass.courseNumber }} )</span>
           </ion-text>        
@@ -92,7 +98,7 @@
     @click="router.push(`/studentList/${cuInsClass.courseNumber}`)"
   >
         <ion-text style="margin: 5px 0px;">          
-          <span>{{ changeTimeTo12(cuInsClass.startDateTime) }}</span><br/>
+          <span style="font-size:12px;">{{ changeTimeTo12(cuInsClass.startDateTime) }}</span><br/>
           <span>{{ cuInsClass.title }}</span> 
           <span> ( {{ cuInsClass.courseNumber }} )</span>
         </ion-text>
@@ -141,6 +147,8 @@ export default {
       gitCompareOutline,
       msg: "hi",
       userName: "",
+      firstName: "",
+      lastName:"",
       userRole: "",
       userID: "",
       isStudent : true,
@@ -265,9 +273,12 @@ export default {
           }
           console.log("isInstructor = " + data.isInstructor);
           console.log("isStudent = " + data.isStudent);
-          this.userName = data.firstName + " " + data.lastName;
+          //this.userName = data.firstName + " " + data.lastName;
+          this.firstName = data.firstName;
+          this.lastName = data.lastName;
           this.isStudent = data.isStudent;
           this.isInstructor = data.isInstructor;
+          this.$store.commit("addUserName", data.firstName + " " + data.lastName);
 
           if( data.isInstructor == false && data.isStudent == true) {
             this.getStudentClasses();
@@ -308,7 +319,7 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log("classes = " + JSON.stringify(data.events));
+          console.log("classes = " + JSON.stringify(data));
           //console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
           this.studentClasses =[];
           this.studentClasses = data.events;
@@ -318,6 +329,9 @@ export default {
           //console.log("class count = "+ this.studentClasses.length);
           if(this.studentClasses.length >=1 ) {this.hasClass = true;}
           else {this.hasClass = false;}
+
+          this.userName = this.$store.getters.getUserName;
+
         })
         .catch(error => {
           this.errorMessage = error;
@@ -353,6 +367,7 @@ export default {
           console.log("instructor has class = "+this.instructorClasses.length + this.isStudent);
           if(this.instructorClasses.length > 0) {this.hasClass = true;}
           else {this.hasClass = false;}
+           this.userName = this.$store.getters.getUserName;
         })
         .catch(error => {
           this.errorMessage = error;
@@ -375,18 +390,21 @@ export default {
   },
 
   // change to 12hr AMPM
-  changeTimeTo12(time){
-    var hh = time.split('T')[1].split(":")[0];
-    var mm = time.split('T')[1].split(":")[1];
-    var AMPM = " AM";
-    if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
-    else if (hh <= 11) {AMPM = " AM";}
-    else if (hh == 12) {AMPM = " PM";}    
-    else if (hh > 12) {AMPM = " PM"; hh -=12;}
+          changeTimeTo12(time) {
+                if( time == null || time == undefined || time == "") {return "";}
+                else {
+                    var hh = time.split('T')[1].split(":")[0];
+                    var mm = time.split('T')[1].split(":")[1];
+                    var AMPM = " AM";
+                    if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
+                    else if (hh <= 11) {AMPM = " AM";}
+                    else if (hh == 12) {AMPM = " PM";}    
+                    else if (hh > 12) {AMPM = " PM"; hh -=12;}
 
-    //console.log(hh+":"+mm+AMPM);
-    return hh+":"+mm+AMPM;
-  }
+                    //console.log(hh+":"+mm+AMPM);
+                    return hh+":"+mm+AMPM;
+                }
+            },
 
 
     //gotoPage(p) {

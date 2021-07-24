@@ -24,6 +24,7 @@ const store = createStore({
             ],
             classes: [],
             insClasses: [],
+            studentList: [],
             tesmpClasses: [{
                     "id": 1,
                     "classID": "154",
@@ -332,7 +333,7 @@ const store = createStore({
                     ]
                 }
             ],
-            userName: 'qwer',
+            userName: '',
             userRole: 'student',
             userID: '',
             token: '',
@@ -378,7 +379,10 @@ const store = createStore({
         },
         addInstructor(state, isInstructor) {
             state.isInstructor = isInstructor;
-        }
+        },
+        addStudentList(state, studentList) {
+            state.studentList = studentList;
+        },
 
     },
     actions: {
@@ -408,6 +412,9 @@ const store = createStore({
         },
         addInstructor(context, isInstructor) {
             context.commit('addInstructor', isInstructor);
+        },
+        addStudentList(context, studentList) {
+            context.commit('addStudentList', studentList);
         }
 
     },
@@ -435,17 +442,24 @@ const store = createStore({
         getInsClasses(state) {
             return state.insClasses;
         },
+        getStudentList(state) {
+            return state.studentList;
+        },
         cuClass(state) {
             return (courseNumber) => {
                 return state.classes.find((cuClass) => cuClass.courseNumber === courseNumber)
             }
-
         },
         cuInsClass(state) {
             return (courseNumber) => {
                 return state.insClasses.find((cuInsClass) => cuInsClass.courseNumber === courseNumber)
             }
 
+        },
+        cuStudentList(state) {
+            return (studentId) => {
+                return state.studentList.find((cuStudentList) => cuStudentList.studentId.toString() == studentId)
+            }
         },
         getToken(state) {
             return state.token;

@@ -8,7 +8,7 @@
         <ion-col size="12" style="text-align: center">
           <!--<h4>Faculty Acceptance</h4>-->
           <div><ion-img src="../../assets/default-avatar.png" style="width:100px;margin: auto;"></ion-img></div>
-          <h2 style="margin:0px;font-weight:bold;">{{student.studentFirstName}} {{student.studentLastName}}</h2>
+          <h2 style="margin:0px;font-weight:bold;">{{student.firstName}} {{student.lastName}}</h2>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -22,20 +22,32 @@
     <!--------->
 
     <ion-grid>
+        <ion-row size="12" v-for="(times, index) in student.clockHistory" :key="times.clockId">
+            <span>{{times.studentClockInDateTime}}</span>
+            <span>{{times.studentClockOutDateTime}}</span><br/>
+            <span>{{times.instructorClockInDateTime}}</span>
+            <span>{{times.instructorClockOutDateTime}}</span>
+            <ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#54595f;" v-if="index%2 === 0 ">
+                 <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button>
+        </ion-row>
+    </ion-grid>
+    <!--
+    <ion-grid>
         <ion-row>
             <ion-col size="8">
-                <ion-col size="5" v-for="(time) in student.timeInOut" :key="time.studentID">
+                <ion-col size="5" v-for="(studentClockInDateTime) in student.clockHistory" :key="time.studentID">
                     <span style="display: inline-block;min-width:100px; height:40px;">{{time}} </span>
                 </ion-col>
             </ion-col>
             <ion-col size="3">
-            <ion-col size="12" v-for="(time, index) in student.timeInOut" :key="time.studentID" >
+            <ion-col size="12" v-for="(studentClockOutDateTime, index) in student.clockHistory" :key="time.studentID" >
                 <ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#54595f;" v-if="index%2 === 0 ">
                  <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button>
             </ion-col>
             </ion-col>
         </ion-row>
     </ion-grid> 
+    -->
 
     <!--------->
     <!--<ion-list>
@@ -104,7 +116,9 @@ export default {
     data() {
         return {
             students:[],
-            student:"",
+            student:{},     // updated  clockHistory, compare this two, build submit actions
+            studentOrig: {}, // original clockHistory
+            submitActionList: [], // array of object for submit action
             classes:[],
             timeInOut:[],
             userName: '',
@@ -123,12 +137,24 @@ export default {
             }
         },
 
+        getTodayDay(){
+            var today = new Date();
+            var yyyy = today.getFullYear().toString();
+            var mm = today.getMonth()+1;
+            if(mm<10) { mm = "0" + mm.toString();}
+            var dd = today.getDate();
+            if(dd<10) { dd = "0" + dd.toString();}
+            today.getDate();
+            return yyyy+mm+dd;
+        },
+
         getStudents(){
             
-            this.students = this.$store.getters.cuClass(this.$route.params.cid).students;  
-            console.log(this.students);   
-            this.student = this.search(this.$route.params.sid, this.students); 
-            console.log(this.student);
+            this.students = this.$store.getters.getStudentList;  
+            console.log("all students = "+JSON.stringify(this.students));   
+            this.student = this.$store.getters.cuStudentList(this.$route.params.sid);
+            this.studentOrig = this.$store.getters.cuStudentList(this.$route.params.sid);
+            console.log("current student = "+JSON.stringify(this.student));
             /*this.classID  = this.$store.getters.cuClass(this.$route.params.id).classID;   
             this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
             this.classStartTime = this.$store.getters.cuClass(

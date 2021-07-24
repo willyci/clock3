@@ -28,13 +28,16 @@
            <h1 style="font-weight:bold;">Time OUT</h1>
           <h1 style="border: solid 1px #dfdfdf;border-radius: 10px;">{{ currentTime }}</h1>
         </ion-col></ion-row>
-        
-      <ion-row><ion-col size="12" style="text-align: center">
+      
+      <ion-row v-if="activeForClockInOut == true"><ion-col size="12" style="text-align: center">
           <ion-button expand="block" @click="onSubmit" style="--background:#ff796a;">
             <ion-icon slot="start" :icon="paperPlaneOutline"></ion-icon>
             Submit
           </ion-button>
         </ion-col></ion-row>
+      <ion-row v-if="activeForClockInOut != true">
+        <h3 style="color:red;">You can't submit time right now, check with your instructor.</h3>
+      </ion-row>  
     </ion-grid>
   </base-layout>
 </template>
@@ -64,6 +67,7 @@ export default {
       InOutFlag: true,
       clockId: "",
       submitClockId:"",
+      activeForClockInOut: true,
     };
   },
   computed: {},
@@ -103,7 +107,22 @@ export default {
       console.log("current time is "+ time.toString());
       this.currentTime = time;
     },
+      // change to 12hr AMPM
+            changeTimeTo12(time) {
+                if( time == null || time == undefined || time == "") {return "";}
+                else {
+                    var hh = time.split('T')[1].split(":")[0];
+                    var mm = time.split('T')[1].split(":")[1];
+                    var AMPM = " AM";
+                    if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
+                    else if (hh <= 11) {AMPM = " AM";}
+                    else if (hh == 12) {AMPM = " PM";}    
+                    else if (hh > 12) {AMPM = " PM"; hh -=12;}
 
+                    //console.log(hh+":"+mm+AMPM);
+                    return hh+":"+mm+AMPM;
+                }
+            },
     getClassTitle() {
       /*
       this.ClassTitle = this.$store.getters.cuClass(
@@ -152,14 +171,17 @@ export default {
       this.classStartTime = this.$store.getters.cuClass(
         this.$route.params.id
       ).startDateTime;
-      this.classEndTime = this.$store.getters.cuClass(
+      this.classEndTime = this.changeTimeTo12(this.$store.getters.cuClass(
         this.$route.params.id
-      ).endDateTime;
+      ).end);
       this.courseNumber = this.$route.params.id;
       console.log("title="+this.ClassTitle);
-      this.classStartTime = this.$store.getters.cuClass(
+      this.classStartTime = this.changeTimeTo12(this.$store.getters.cuClass(
         this.$route.params.id
-      ).startDateTime;
+      ).start);
+
+      this.activeForClockInOut = ( this.$store.getters.cuClass(
+        this.$route.params.id).activeForClockInOut == "Y" ) ? true : false ;
       
     },
 

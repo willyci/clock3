@@ -33,16 +33,16 @@
                     @click="router.push(`/editTimes/${classID}/${student.studentId}`)"
                      v-for="time in student.clockHistory" :key="time.studentID"
                     >
-                            <ion-col size="4" v-if="student.clockHistory.length > 0">
+                            <ion-col size="5" v-if="student.clockHistory.length > 0">
                                 <div>{{this.changeTimeTo12(time.studentClockInDateTime)}}</div>
                             </ion-col>
-                            <ion-col size="4" v-if="student.clockHistory.length > 0">
+                            <ion-col size="5" v-if="student.clockHistory.length > 0">
                                 <div>{{this.changeTimeTo12(time.studentClockOutDateTime)}}</div>
                             </ion-col>
                         
                     </ion-row>
-                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.isAbsent == 'Y'"
-                    @click="router.push(`/editTimes/${classID}/${student.studentID}`)"
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 0"
+                    @click="router.push(`/editTimes/${classID}/${student.studentId}`)"
                     >
                         <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
                     </ion-row>
@@ -189,6 +189,7 @@ export default {
                         this.classStartTime = this.changeTimeTo12(this.$store.getters.cuInsClass(this.$route.params.id).startDateTime);
                         this.classEndTime = this.changeTimeTo12(this.$store.getters.cuInsClass(this.$route.params.id).endDateTime);
                         this.studentList = data.students;
+                        this.$store.commit("addStudentList",data.students);
                     }
                 })
                 .catch(error => {
