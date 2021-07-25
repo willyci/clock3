@@ -22,14 +22,39 @@
     <!--------->
 
     <ion-grid>
-        <ion-row size="12" v-for="(times, index) in student.clockHistory" :key="times.clockId">
-            <span>{{times.studentClockInDateTime}}</span>
-            <span>{{times.studentClockOutDateTime}}</span><br/>
-            <span>{{times.instructorClockInDateTime}}</span>
-            <span>{{times.instructorClockOutDateTime}}</span>
-            <ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#54595f;" v-if="index%2 === 0 ">
-                 <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button>
-        </ion-row>
+        <div v-for="(times, index) in student.clockHistory" :key="times.clockId">
+            <ion-row v-if="times.studentClockInDateTime != null && times.studentClockInDateTime != undefined && times.studentClockInDateTime != ''">
+                
+                <ion-col size="4">
+                    <!--<ion-datetime display-format="h:mm A" picker-format="h:mm A" 
+                    v-model="times.studentClockInDateTime"
+                    v-bind:value="times.studentClockInDateTime"
+                    @IonChange="times.studentClockInDateTime=$event.target.value"
+                    ></ion-datetime>-->
+                    <span style="color:gray;">{{changeTimeTo12(times.studentClockInDateTime)}}</span>
+                </ion-col>
+                <ion-col size="4"><span style="color:gray;">{{changeTimeTo12(times.studentClockOutDateTime)}}</span></ion-col>
+                <ion-col size="4"><ion-button  @click="editSelectedTime(index)" style="height:24px;--background:#54595f;">
+                    <ion-icon  slot="icon-only" :icon="createOutline"></ion-icon></ion-button></ion-col>
+            </ion-row>
+            <ion-row v-if="times.instructorClockInDateTime != null && times.instructorClockInDateTime != undefined && times.instructorClockInDateTime != ''">
+                <!--<ion-col size="4"><span>{{changeTimeTo12(times.instructorClockInDateTime)}}</span></ion-col>
+                <ion-col size="4"><span>{{changeTimeTo12(times.instructorClockOutDateTime)}}</span></ion-col>-->
+                <ion-col size="4"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
+                    v-model="times.instructorClockInDateTime"
+                    v-bind:value="times.instructorClockInDateTime"
+                    @IonChange="times.instructorClockInDateTime=$event.target.value"
+                    ></ion-datetime></ion-col>
+                <ion-col size="4"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
+                    v-model="times.instructorClockOutDateTime"
+                    v-bind:value="times.instructorClockOutDateTime"
+                    @IonChange="times.instructorClockOutDateTime=$event.target.value"
+                    ></ion-datetime></ion-col>
+                <ion-col size="4"><ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#54595f;">
+                    <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button></ion-col>
+            </ion-row>
+            <hr style="border-width: 1px;"/>
+        </div>
     </ion-grid>
     <!--
     <ion-grid>
@@ -124,11 +149,18 @@ export default {
             userName: '',
             createOutline,
             closeCircleOutline,
-            addCircleOutline
+            addCircleOutline,
+            semester: '',
+            courseNumber: '',
+            courseSection: '',
+            labSection: '',
+            studentId: '',
         }
     },
     methods:{
-            
+        updateTime(event){
+            console.log(event);
+        },
         search(nameKey, myArray){
             for (var i=0; i < myArray.length; i++) {
                 if (myArray[i].studentID === nameKey) {
@@ -147,13 +179,30 @@ export default {
             today.getDate();
             return yyyy+mm+dd;
         },
+          // change to 12hr AMPM
+        changeTimeTo12(time) {
+            if( time == null || time == undefined || time == "") {return "";}
+            else {
+                var hh = time.split('T')[1].split(":")[0];
+                var mm = time.split('T')[1].split(":")[1];
+                var AMPM = " AM";
+                if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
+                else if (hh <= 11) {AMPM = " AM";}
+                else if (hh == 12) {AMPM = " PM";}    
+                else if (hh > 12) {AMPM = " PM"; hh -=12;}
+
+                //console.log(hh+":"+mm+AMPM);
+                return hh+":"+mm+AMPM;
+            }
+        },
 
         getStudents(){
             
             this.students = this.$store.getters.getStudentList;  
             console.log("all students = "+JSON.stringify(this.students));   
             this.student = this.$store.getters.cuStudentList(this.$route.params.sid);
-            this.studentOrig = this.$store.getters.cuStudentList(this.$route.params.sid);
+            //this.studentOrig = this.$store.getters.cuStudentList(this.$route.params.sid);
+            this.studentOrig = JSON.parse(JSON.stringify(this.student));
             console.log("current student = "+JSON.stringify(this.student));
             /*this.classID  = this.$store.getters.cuClass(this.$route.params.id).classID;   
             this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
@@ -170,17 +219,56 @@ export default {
         removeSelectedTime(index){
             // pick selected time
             console.log(index);
-
+            console.log("current student = "+JSON.stringify(this.student));
+            var clockHistory = {};
+            clockHistory = {
+                "clockId": this.student.clockHistory[index].clockId,
+                "studentClockInDateTime": this.student.clockHistory[index].studentClockInDateTime,
+                "studentClockOutDateTime": this.student.clockHistory[index].studentClockOutDateTime
+            };
+            this.student.clockHistory[index] = clockHistory;
         },
         // add time to end of list, update list
-        addNewTime(student){
+        addNewTime(){
             // new time add to array, 
             // bring up time picket
-            console.log(student);
+            console.log(this.student);
+            console.log("current student = "+JSON.stringify(this.student));
+            let newTime =  new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit' }).replace(', ','T').replace(' h ',':');
+            
+            var clockHistory = {};
+            clockHistory = {
+                "clockId":"",
+                "instructorClockInDateTime":newTime,
+                "instructorClockOutDateTime":newTime
+            };
+            this.student.clockHistory.push(clockHistory);
+            console.log("current student with added time = "+JSON.stringify(this.student));
+
+        },
+        editSelectedTime(index) {
+            console.log("current student = "+JSON.stringify(this.student));
+            var clockHistory = {};
+            let newTime =  new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit' }).replace(', ','T').replace(' h ',':');
+            clockHistory = {
+                "clockId": this.student.clockHistory[index].clockId,
+                "studentClockInDateTime": this.student.clockHistory[index].studentClockInDateTime,
+                "studentClockOutDateTime": this.student.clockHistory[index].studentClockOutDateTime,
+                "instructorClockInDateTime":newTime,
+                "instructorClockOutDateTime":newTime
+            };
+
+            this.student.clockHistory[index] = clockHistory;
         },
 
         onSubmit(){
-            this.openToastSuccessful();
+            // this.openToastSuccessful();
+            // compare student and studentOrig
+            // build list of items need to commit
+            // set absent or not
+            console.log("new student = "+JSON.stringify(this.student)); 
+            console.log("old student = "+JSON.stringify(this.studentOrig)); 
+
         },
             async openToastSuccessful() {
             const toast = await toastController

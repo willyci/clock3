@@ -390,21 +390,21 @@ export default {
   },
 
   // change to 12hr AMPM
-          changeTimeTo12(time) {
-                if( time == null || time == undefined || time == "") {return "";}
-                else {
-                    var hh = time.split('T')[1].split(":")[0];
-                    var mm = time.split('T')[1].split(":")[1];
-                    var AMPM = " AM";
-                    if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
-                    else if (hh <= 11) {AMPM = " AM";}
-                    else if (hh == 12) {AMPM = " PM";}    
-                    else if (hh > 12) {AMPM = " PM"; hh -=12;}
+  changeTimeTo12(time) {
+        if( time == null || time == undefined || time == "") {return "";}
+        else {
+            var hh = time.split('T')[1].split(":")[0];
+            var mm = time.split('T')[1].split(":")[1];
+            var AMPM = " AM";
+            if (hh[0]=="0") {AMPM = " AM"; hh=hh[1];}
+            else if (hh <= 11) {AMPM = " AM";}
+            else if (hh == 12) {AMPM = " PM";}    
+            else if (hh > 12) {AMPM = " PM"; hh -=12;}
 
-                    //console.log(hh+":"+mm+AMPM);
-                    return hh+":"+mm+AMPM;
-                }
-            },
+            //console.log(hh+":"+mm+AMPM);
+            return hh+":"+mm+AMPM;
+        }
+    },
 
 
     //gotoPage(p) {
