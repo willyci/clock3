@@ -112,7 +112,7 @@
       </ion-col></ion-row>
 </ion-grid> 
     <ion-row>
-        <h2 style="color:red;" v-if="errorCount>0">Number of {{errorCount}} Found on submit.</h2>
+        <h2 style="color:red;" v-if="errorCount>0">{{errorCount}} server error(s) Found on submit.</h2>
     </ion-row>
     </base-layout>
 </template>

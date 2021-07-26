@@ -25,7 +25,8 @@ const routes = [{
     },
     {
         path: '/classList',
-        component: ClassListPage
+        component: ClassListPage,
+        name: 'classList'
     },
     {
         path: '/submitTime/:id',

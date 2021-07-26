@@ -456,7 +456,7 @@ export default {
   },
   watch:{
      $route (to,from){
-        if(to.name == "studentList") {
+        if(to.name == "classList") {
           if(this.isStudent) {this.getStudentClasses();}
           if(this.isInstructor) {this.getInstructorClasses();}
         }
