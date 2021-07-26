@@ -30,7 +30,7 @@
                 <ion-col size="10">
                     <div><span style="font-weight:bold;">{{student.firstName}} {{student.lastName}} </span></div>
                     <ion-row style="align-content: flex-start;" 
-                    @click="router.push(`/editTimes/${classID}/${student.studentId}`)"
+                    @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
                      v-for="time in student.clockHistory" :key="time.studentID"
                     >
                             <ion-col size="5" v-if="student.clockHistory.length > 0">
@@ -41,8 +41,13 @@
                             </ion-col>
                         
                     </ion-row>
-                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 0"
-                    @click="router.push(`/editTimes/${classID}/${student.studentId}`)"
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 0 "
+                    @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
+                    >
+                        <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
+                    </ion-row>
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 1 &&  student.clockHistory[0].isAbsent == 'Y'"
+                    @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
                     >
                         <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
                     </ion-row>
@@ -92,11 +97,13 @@ export default {
             userRole:'',
             userID:'',
             classID:'',
+            classIDLong:'',
             ClassTitle:'',
             refreshOutline,
             paperPlaneOutline,            
             classStartTime: "",
             classEndTime: "",
+            cuInsClass: {},
         }
     },
     methods:{
@@ -158,8 +165,9 @@ export default {
             ).classEndTime;
             */
             //var token = this.$store.getters.getToken;
-            //console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
-
+            console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
+            this.classIDLong = this.$route.params.id;
+            this.cuInsClass = this.$store.getters.cuInsClass(this.$route.params.id);
             const requestOptions = {
                 method: "GET",
                 headers: { 'Content-Type': 'application/json', 
@@ -169,10 +177,10 @@ export default {
 
             var url = "https://qa2-web.scansoftware.com/cafeweb/api/instructor/classClockTimes?"+ 
                         "date=" + this.getTodayDay() +
-                        "&semester=" + this.$store.getters.cuInsClass(this.$route.params.id).semester +                
-                        "&courseNumber=" + this.$route.params.id + 
-                        "&courseSection=" + this.$store.getters.cuInsClass(this.$route.params.id).courseSection + 
-                        "&labSection=" + this.$store.getters.cuInsClass(this.$route.params.id).labSection
+                        "&semester=" + this.cuInsClass.semester +                
+                        "&courseNumber=" + this.cuInsClass.courseNumber + 
+                        "&courseSection=" + this.cuInsClass.courseSection + 
+                        "&labSection=" + this.cuInsClass.labSection
             fetch(url, requestOptions)
                 .then(async response => {
                     const data = await response.json();
@@ -184,10 +192,10 @@ export default {
                         console.log("studnet list = "+JSON.stringify(data));
                         console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
 
-                        this.ClassTitle = this.$store.getters.cuInsClass(this.$route.params.id).title;
-                        this.classID = this.$store.getters.cuInsClass(this.$route.params.id).courseNumber;
-                        this.classStartTime = this.changeTimeTo12(this.$store.getters.cuInsClass(this.$route.params.id).startDateTime);
-                        this.classEndTime = this.changeTimeTo12(this.$store.getters.cuInsClass(this.$route.params.id).endDateTime);
+                        this.ClassTitle = this.cuInsClass.title;
+                        this.classID = this.cuInsClass.courseNumber;
+                        this.classStartTime = this.changeTimeTo12(this.cuInsClass.startDateTime);
+                        this.classEndTime = this.changeTimeTo12(this.cuInsClass.endDateTime);
                         this.studentList = data.students;
                         this.$store.commit("addStudentList",data.students);
                     }
@@ -200,7 +208,40 @@ export default {
         },
 
         onSubmit(){
-            this.openToastSuccessful();
+            // post /cafeweb/api/instructor/studentClockTime
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/confirmClassClockTimes?'+            
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay()
+                , requestOptions)
+                .then(async response => {
+                const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    const error = (data && data.message) || response.status;
+                    return Promise.reject(error);                    
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                    console.log("accepted all time");
+                    this.openToastSuccessful();
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.openToastFailed();
+                });
+            
         },
             async openToastSuccessful() {
             const toast = await toastController
@@ -249,7 +290,16 @@ export default {
       this.getStudents();
       let today = new Date();
       this.currentDate = today.toDateString();
-  }
+  },
+  watch:{
+     $route (to,from){
+        //this.getStudents();
+        if(to.name == "studentList") {
+            this.getStudents();
+        }
+        console.log("studentListPage"+to+from);
+    }
+  },
     
 }
 </script>

@@ -109,8 +109,8 @@ export default {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer token'},
-        //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
-        body: JSON.stringify({"username":"instructor2","password":"instructor2"})
+        body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
+        //body: JSON.stringify({"username":"instructor2","password":"instructor2"})
         //body: JSON.stringify({"username":"student2","password":"student2"})
         //body: JSON.stringify({"username":"student3","password":"student3"})
 

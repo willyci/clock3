@@ -25,15 +25,8 @@
         <div v-for="(times, index) in student.clockHistory" :key="times.clockId">
             <ion-row v-if="times.studentClockInDateTime != null && times.studentClockInDateTime != undefined && times.studentClockInDateTime != ''">
                 
-                <ion-col size="4">
-                    <!--<ion-datetime display-format="h:mm A" picker-format="h:mm A" 
-                    v-model="times.studentClockInDateTime"
-                    v-bind:value="times.studentClockInDateTime"
-                    @IonChange="times.studentClockInDateTime=$event.target.value"
-                    ></ion-datetime>-->
-                    <span style="color:gray;">{{changeTimeTo12(times.studentClockInDateTime)}}</span>
-                </ion-col>
-                <ion-col size="4"><span style="color:gray;">{{changeTimeTo12(times.studentClockOutDateTime)}}</span></ion-col>
+                <ion-col size="4"><span style="color:gray;padding-left: 15px;">{{changeTimeTo12(times.studentClockInDateTime)}}</span></ion-col>
+                <ion-col size="4"><span style="color:gray;padding-left: 15px;">{{changeTimeTo12(times.studentClockOutDateTime)}}</span></ion-col>
                 <ion-col size="4"><ion-button  @click="editSelectedTime(index)" style="height:24px;--background:#54595f;">
                     <ion-icon  slot="icon-only" :icon="createOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
@@ -118,6 +111,9 @@
     </ion-button>
       </ion-col></ion-row>
 </ion-grid> 
+    <ion-row>
+        <h2 style="color:red;" v-if="errorCount>0">Number of {{errorCount}} Found on submit.</h2>
+    </ion-row>
     </base-layout>
 </template>
 <script>
@@ -145,6 +141,7 @@ export default {
             studentOrig: {}, // original clockHistory
             submitActionList: [], // array of object for submit action
             classes:[],
+            cuInsClass:{},
             timeInOut:[],
             userName: '',
             createOutline,
@@ -155,6 +152,7 @@ export default {
             courseSection: '',
             labSection: '',
             studentId: '',
+            errorCount: 0,
         }
     },
     methods:{
@@ -204,6 +202,8 @@ export default {
             //this.studentOrig = this.$store.getters.cuStudentList(this.$route.params.sid);
             this.studentOrig = JSON.parse(JSON.stringify(this.student));
             console.log("current student = "+JSON.stringify(this.student));
+            this.cuInsClass = this.$store.getters.cuInsClass(this.$route.params.cid);
+
             /*this.classID  = this.$store.getters.cuClass(this.$route.params.id).classID;   
             this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
             this.classStartTime = this.$store.getters.cuClass(
@@ -238,7 +238,7 @@ export default {
             
             var clockHistory = {};
             clockHistory = {
-                "clockId":"",
+                clockId:"",
                 "instructorClockInDateTime":newTime,
                 "instructorClockOutDateTime":newTime
             };
@@ -269,7 +269,275 @@ export default {
             console.log("new student = "+JSON.stringify(this.student)); 
             console.log("old student = "+JSON.stringify(this.studentOrig)); 
 
+            
+            for(var i = 0; i < this.student.clockHistory.length; i++){
+                if( this.student.clockHistory[i].instructorClockInDateTime != undefined && (
+                    this.student.clockHistory[i].instructorClockInDateTime.length > 4 ||
+                    this.student.clockHistory[i].instructorClockOutDateTime.length > 4 ) ) {
+                        console.log(i+" instructorClock is not empty");
+                        if(this.student.clockHistory[i].clockId != undefined && this.student.clockHistory[i].clockId == ""){
+                            console.log(i+" instructorClock is new");
+                            this.submitNewTime(i)
+                        } else {
+                            console.log(i+" instructorClock is not empty 2");
+                            if( this.student.clockHistory[i].instructorClockInDateTime != undefined && (
+                                this.student.clockHistory[i].instructorClockInDateTime != this.studentOrig.clockHistory[i].instructorClockInDateTime ||
+                                this.student.clockHistory[i].instructorClockOutDateTime != this.studentOrig.clockHistory[i].instructorClockOutDateTime )
+                            ){
+                                console.log(i+" instructorClock is updated");
+                                this.submitUpdateTime(i)
+                            }
+                        }
+                    }
+                else if ( this.student.clockHistory[i].instructorClockInDateTime != undefined && (
+                          this.student.clockHistory[i].instructorClockInDateTime.length < 4 &&
+                          this.student.clockHistory[i].instructorClockOutDateTime.length < 4 && 
+                          this.student.clockHistory[i].clockId != "" ) ){
+                          console.log(i+" instructorClock is deleted");
+                          this.submitDelTime(i)
+
+                } else {
+                    console.log(i+" do nothing.");
+                }
+            }
+
+            // set absent flag
+            if(this.hasClock()) {
+                this.submitDelAbsent();
+            } else {
+                this.submitAddAbsent();
+            }
+
+
         },
+
+        // Add new instructor clock hours record for a student in instructor’s class.
+        submitNewTime(index){
+            // post /cafeweb/api/instructor/studentClockTime
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+            
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay() +
+                "&studentId=" + this.student.studentId +
+                "&colckIn=" + this.student.clockHistory[index].instructorClockInDateTime +
+                "&clockOut=" +  this.student.clockHistory[index].instructorClockOutDateTime
+                , requestOptions)
+                .then(async response => {
+                const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    const error = (data && data.message) || response.status;
+                    this.errorCount++;
+                    return Promise.reject(error);
+                    
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                console.log("added new time "+index);
+                })
+                .catch(error => {
+                this.errorMessage = error;
+                console.error('There was an error!', error);
+                this.errorCount++;
+                });
+        },
+
+        // Update instructor clock hours for an existing clock hour record
+        submitUpdateTime(index){
+            // put  /cafeweb/api/instructor/studentClockTime
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+            
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay() +
+                "&studentId=" + this.student.studentId +
+                "&clockId=" + this.student.clockHistory[index].clockId +
+                "&colckIn=" + this.student.clockHistory[index].instructorClockInDateTime +
+                "&clockOut=" +  this.student.clockHistory[index].instructorClockOutDateTime
+                , requestOptions)
+                .then(async response => {
+                const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    const error = (data && data.message) || response.status;
+                    this.errorCount++;
+                    return Promise.reject(error);
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                    console.log("updated old time"+index);
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.errorCount++;
+                });
+        },
+
+        // Delete clock hours records. Record can only be deleted if student clock hours do not exist.
+        // No student time
+        // has inst time only
+        submitDelTime(index){
+            //  DELETE  /cafeweb/api/instructor/studentClockTime
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+            
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay() +
+                "&studentId=" + this.student.studentId +
+                "&clockId=" + this.student.clockHistory[index].clockId 
+                , requestOptions)
+                .then(async response => {
+                const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    const error = (data && data.message) || response.status;
+                    this.errorCount++;
+                    return Promise.reject(error);
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                    console.log("updated old time"+index);
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.errorCount++;
+                });
+        },
+
+        // Absent flag is stored in clock hour record with no instructor or student clock in/out hours.
+        // add absent flag to "Y"
+        submitAddAbsent(){
+            // POST  /cafeweb/api/instructor/studentAbsent
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+            
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay() +
+                "&studentId=" + this.student.studentId
+                , requestOptions)
+                .then(async response => {
+                const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    const error = (data && data.message) || response.status;
+                    this.errorCount++;
+                    return Promise.reject(error);
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                    console.log("mark absent Y");
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.errorCount++;
+                });
+        },
+
+        // Absent flag is stored in clock hour record with no instructor or student clock in/out hours.
+        // remove absent flag to "N"
+        submitDelAbsent() {
+            // DELETE  /cafeweb/api/instructor/studentAbsent
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+            
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay() +
+                "&studentId=" + this.student.studentId + 
+                "&clockId=" + this.student.clockHistory[0].clockId
+                , requestOptions)
+                .then(async response => {
+                const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    const error = (data && data.message) || response.status;
+                    this.errorCount++;
+                    return Promise.reject(error);
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                    console.log("mark absent N");
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.errorCount++;
+                });
+        },
+
+        hasClock(){
+            if(this.student.clockHistory.length > 1 ) {
+                // has studnet clock
+                if(
+                    this.student.clockHistory[0].clockId != undefined && 
+                    this.student.clockHistory[0].clockId != "" && 
+                    this.student.clockHistory[0].studentClockInDateTime.length > 4
+                ) {
+                    return true;
+                } 
+                // has instructor clock no clock id
+                else if (
+                    this.student.clockHistory[0].clockId != undefined && 
+                    this.student.clockHistory[0].clockId == "" && 
+                    this.student.clockHistory[0].instructorClockInDateTime != undefined && 
+                    this.student.clockHistory[0].instructorClockInDateTime.length > 4
+                ) {
+                    return true;
+                }               
+                else {return false;}
+            }
+             else {return false;}
+        },
+
+
             async openToastSuccessful() {
             const toast = await toastController
                 .create({

@@ -452,7 +452,26 @@ const store = createStore({
         },
         cuInsClass(state) {
             return (courseNumber) => {
-                return state.insClasses.find((cuInsClass) => cuInsClass.courseNumber === courseNumber)
+                //return state.insClasses.find((cuInsClass) => (cuInsClass.courseNumber) === courseNumber)
+
+                return state.insClasses.find((cuInsClass) =>
+                    (cuInsClass.semester + "-" +
+                        cuInsClass.courseNumber + "-" +
+                        cuInsClass.courseSection + "-" +
+                        cuInsClass.labSection
+                    ) === courseNumber)
+
+                /*return state.insClasses.filter(function(cuInsClass){
+                    if( 
+                        cuInsClass.semester === semester &&
+                        cuInsClass.courseNumber === courseNumber &&
+                        cuInsClass.courseSection === courseSection &&
+                        cuInsClass.labSection === labSection
+                        ) { 
+                            return cuInsClass;
+                        } 
+
+                });*/
             }
 
         },

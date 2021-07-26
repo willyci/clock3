@@ -95,7 +95,7 @@
     v-for="cuInsClass in instructorClasses"
     :key="cuInsClass.courseNumber"
     class="course-block"
-    @click="router.push(`/studentList/${cuInsClass.courseNumber}`)"
+    @click="router.push(`/studentList/${cuInsClass.semester +'-'+ cuInsClass.courseNumber +'-'+ cuInsClass.courseSection +'-'+cuInsClass.labSection}`)"
   >
         <ion-text style="margin: 5px 0px;">          
           <span style="font-size:12px;">{{ changeTimeTo12(cuInsClass.startDateTime) }}</span><br/>
@@ -455,10 +455,12 @@ export default {
     console.log('--onUpdated Updated');
   },
   watch:{
-     $route (){
-        if(this.isStudent) {this.getStudentClasses();}
-        if(this.isInstructor) {this.getInstructorClasses();}
-        //console.log(to+from);
+     $route (to,from){
+        if(to.name == "studentList") {
+          if(this.isStudent) {this.getStudentClasses();}
+          if(this.isInstructor) {this.getInstructorClasses();}
+        }
+        console.log("classlistpage"+to+from);
     }
   },
 };
