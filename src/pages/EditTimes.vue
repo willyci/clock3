@@ -15,39 +15,41 @@
     <!--------->
     <ion-grid>
         <ion-row>
-            <ion-col size='3' style="margin-left:25px;">IN</ion-col>
-            <ion-col size='5' style="margin-left:25px;">OUT</ion-col>
-        </ion-row>
-        <ion-row><hr style="border-width: 1px;"/></ion-row>
+            <ion-col size='4' style="text-align:center;">IN</ion-col>
+            <ion-col size='4' style="text-align:center;">OUT</ion-col>
+            <ion-col size='4' style="margin-left:25px;text-align:center;"></ion-col>
+        </ion-row>        
     </ion-grid> 
+    <hr style="border-width: 1px; margin: 0 20px;"/>
     <!--------->
 
     <ion-grid>
         <div v-for="(times, index) in student.clockHistory" :key="times.clockId">
             <ion-row v-if="times.studentClockInDateTime != null && times.studentClockInDateTime != undefined && times.studentClockInDateTime != ''">
                 
-                <ion-col size="4"><span style="color:gray;padding-left: 15px;">{{changeTimeTo12(times.studentClockInDateTime)}}</span></ion-col>
-                <ion-col size="4"><span style="color:gray;padding-left: 15px;">{{changeTimeTo12(times.studentClockOutDateTime)}}</span></ion-col>
-                <ion-col size="4"><ion-button  @click="editSelectedTime(index)" style="height:24px;--background:#517FC8;">
+                <ion-col size="4"><span style="color:gray;padding-left: 15px;text-align:center;">{{changeTimeTo12(times.studentClockInDateTime)}}</span></ion-col>
+                <ion-col size="4"><span style="color:gray;padding-left: 15px;text-align:center;">{{changeTimeTo12(times.studentClockOutDateTime)}}</span></ion-col>
+                <ion-col size="4" style="text-align: center;"><ion-button  @click="editSelectedTime(index)" style="height:24px;--background:#517FC8;">
                     <ion-icon  slot="icon-only" :icon="createOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
             <ion-row v-if="times.instructorClockInDateTime != null && times.instructorClockInDateTime != undefined && times.instructorClockInDateTime != ''">
                 <!--<ion-col size="4"><span>{{changeTimeTo12(times.instructorClockInDateTime)}}</span></ion-col>
                 <ion-col size="4"><span>{{changeTimeTo12(times.instructorClockOutDateTime)}}</span></ion-col>-->
-                <ion-col size="4"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
+                <ion-col size="4" style="text-align: center;">
+                    <ion-datetime display-format="h:mm A" picker-format="h:mm A" 
                     v-model="times.instructorClockInDateTime"
                     v-bind:value="times.instructorClockInDateTime"
                     @IonChange="times.instructorClockInDateTime=$event.target.value;times.modify=2;"
                     ></ion-datetime></ion-col>
-                <ion-col size="4"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
+                <ion-col size="4" style="text-align: center;"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
                     v-model="times.instructorClockOutDateTime"
                     v-bind:value="times.instructorClockOutDateTime"
                     @IonChange="times.instructorClockOutDateTime=$event.target.value;times.modify=2;"
                     ></ion-datetime></ion-col>
-                <ion-col size="4"><ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#517FC8;">
+                <ion-col size="4" style="text-align: center;"><ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#517FC8;">
                     <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
-            <hr style="border-width: 1px;"/>
+            <hr style="border-width: 1px; margin: 0 20px;"/>
         </div>
     </ion-grid>
     <!--
