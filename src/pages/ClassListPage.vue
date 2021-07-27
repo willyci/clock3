@@ -8,10 +8,10 @@
         <ion-col size="12" style="text-align: center">          
           <!--<h4>Class Schedule</h4>-->
           <h2 style="font-weight:bold;">{{userName}}</h2>
-          <h2 style="margin:0px;">Today</h2>
-          <h2 style="margin:0px;font-weight:bold;">{{ currentDate }}</h2>
-          <h2 style="margin:0px;font-weight:bold;padding-bottom:10px;">{{ currentTime}}</h2>
-          <h2 style="margin:0px;font-weight:bold;padding-bottom:10px;color:red;" v-if="!hasClass">No class found</h2>
+          <h2 style="margin:0px;margin-top: 10px;">Today</h2>
+          <h2 style="margin:0px;margin-top: 10px;font-weight:bold;">{{ currentDate }}</h2>
+          <h2 style="margin:0px;margin-top: 10px;font-weight:bold;padding-bottom:10px;">{{ currentTime}}</h2>
+          <h2 style="margin:0px;margin-top: 10px;font-weight:bold;padding-bottom:10px;color:red;" v-if="!hasClass">No class found</h2>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -58,7 +58,7 @@
   <div v-for="cuClass in studentClasses"
       :key="cuClass.id">
 
-    <ion-row style="background:#54595f;"   v-if="cuClass.activeForClockInOut=='Y'"   
+    <ion-row style="background:#517FC8;margin:15px 10px;"   v-if="cuClass.activeForClockInOut=='Y'"   
       class="course-block"
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
@@ -75,7 +75,7 @@
           </ion-text>        
     </ion-row>
 
-    <ion-row style="background:#bebaba;"   v-if="cuClass.activeForClockInOut!='Y'"   
+    <ion-row style="background:#727272;margin:15px 10px;"   v-if="cuClass.activeForClockInOut!='Y'"   
       class="course-block"
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
@@ -91,7 +91,7 @@
 
 <!-------------------------------------->
 <ion-grid v-if="isStudent != true">
-  <ion-row style="background:#54595f;"
+  <ion-row style="background:#517FC8;margin:15px 10px;"
     v-for="cuInsClass in instructorClasses"
     :key="cuInsClass.courseNumber"
     class="course-block"

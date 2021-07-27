@@ -8,8 +8,8 @@
         <ion-col size="12" style="text-align: center">
           <!--<h4>Faculty Acceptance</h4>-->
           <h2 style="margin:0px;font-weight:bold;">{{ ClassTitle }} ({{ classID }})</h2>
-          <h4 style="margin:0px;">{{ currentDate }}</h4>
-          <h4 style="margin:0px;">{{classStartTime}} - {{classEndTime}}</h4>
+          <h4 style="margin:0px;margin-top: 10px;">{{ currentDate }}</h4>
+          <h4 style="margin:0px;margin-top: 10px;">{{classStartTime}} - {{classEndTime}}</h4>
         </ion-col>
       </ion-row>
 
@@ -20,7 +20,7 @@
     <ion-list>
         <ion-item 
             v-for="student in studentList" 
-            :key="student.studentID"
+            :key="student.studentID" style="margin-right:20px;"
             ><ion-grid>
             <ion-row ion-no-padding>
                 <ion-col size="2"><div><ion-img

@@ -25,14 +25,14 @@
           </ion-select>
         </ion-item>
         -->
-          <h3 style="color:red;" v-if="loginError == true">Incorrect email or password!</h3>        
-        <ion-item>
+          <h3 style="color:red;padding:0 10px;text-align:center;" v-if="loginError == true">Incorrect email or password!</h3>        
+        <ion-item style="padding:0 20px;">
           <!--<ion-input placeholder="Email" v-model="userInfo.username">joeey.fergusonn</ion-input>-->
           <ion-input placeholder="Email" v-model="userInfo.username"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item style="padding:0 20px;">
           <!--<ion-input placeholder="Password" type="password" v-model="userInfo.password">660090023</ion-input>-->
-          <ion-input placeholder="Password" type="password" v-model="userInfo.password"></ion-input>
+          <ion-input placeholder="Password" type="password" v-model="userInfo.password"  ></ion-input>
         </ion-item>
         
       </ion-col>
@@ -41,7 +41,7 @@
   <ion-row
     ><ion-col size="12" style="text-align: center">
       <!--<ion-button expand="block" @click="() => router.push('/classList')">-->
-        <ion-button expand="block" @click="loginSubmit()" style="--background:#ff796a;">
+        <ion-button expand="block" @click="loginSubmit()" style="--background:#ff796a;padding:0 80px;">
         <ion-icon slot="start" :icon="lockOpenOutline"></ion-icon>
         Login
       </ion-button>
@@ -109,8 +109,8 @@ export default {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 
                   'Authorization': 'Bearer token'},
-        body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
-        //body: JSON.stringify({"username":"instructor2","password":"instructor2"})
+        //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
+        body: JSON.stringify({"username":"instructor2","password":"instructor2"})
         //body: JSON.stringify({"username":"student2","password":"student2"})
         //body: JSON.stringify({"username":"student3","password":"student3"})
 

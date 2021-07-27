@@ -36,7 +36,7 @@
           </ion-button>
         </ion-col></ion-row>
       <ion-row v-if="activeForClockInOut != true">
-        <h3 style="color:red;">You can't submit time right now, check with your instructor.</h3>
+        <h3 style="color:red;padding0 30px;text-align:center;">You can't submit time right now, check with your instructor.</h3>
       </ion-row>  
     </ion-grid>
   </base-layout>

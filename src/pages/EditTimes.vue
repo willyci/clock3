@@ -7,7 +7,7 @@
       <ion-row>
         <ion-col size="12" style="text-align: center">
           <!--<h4>Faculty Acceptance</h4>-->
-          <div><ion-img src="../../assets/default-avatar.png" style="width:100px;margin: auto;"></ion-img></div>
+          <div><ion-img src="../../assets/default-avatar.png" style="width:100px;margin: auto;margin-bottom:10px;"></ion-img></div>
           <h2 style="margin:0px;font-weight:bold;">{{student.firstName}} {{student.lastName}}</h2>
         </ion-col>
       </ion-row>
@@ -18,6 +18,7 @@
             <ion-col size='3' style="margin-left:25px;">IN</ion-col>
             <ion-col size='5' style="margin-left:25px;">OUT</ion-col>
         </ion-row>
+        <ion-row><hr style="border-width: 1px;"/></ion-row>
     </ion-grid> 
     <!--------->
 
@@ -27,7 +28,7 @@
                 
                 <ion-col size="4"><span style="color:gray;padding-left: 15px;">{{changeTimeTo12(times.studentClockInDateTime)}}</span></ion-col>
                 <ion-col size="4"><span style="color:gray;padding-left: 15px;">{{changeTimeTo12(times.studentClockOutDateTime)}}</span></ion-col>
-                <ion-col size="4"><ion-button  @click="editSelectedTime(index)" style="height:24px;--background:#54595f;">
+                <ion-col size="4"><ion-button  @click="editSelectedTime(index)" style="height:24px;--background:#517FC8;">
                     <ion-icon  slot="icon-only" :icon="createOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
             <ion-row v-if="times.instructorClockInDateTime != null && times.instructorClockInDateTime != undefined && times.instructorClockInDateTime != ''">
@@ -43,7 +44,7 @@
                     v-bind:value="times.instructorClockOutDateTime"
                     @IonChange="times.instructorClockOutDateTime=$event.target.value;times.modify=2;"
                     ></ion-datetime></ion-col>
-                <ion-col size="4"><ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#54595f;">
+                <ion-col size="4"><ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#517FC8;">
                     <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
             <hr style="border-width: 1px;"/>
@@ -96,7 +97,7 @@
     <ion-grid>
         <ion-row>
             <ion-col size="12">
-                <ion-button  @click="addNewTime(student)" style="--background:#54595f;padding:0 90px;" expand="full">
+                <ion-button  @click="addNewTime(student)" style="--background:#517FC8;padding:0 90px;" expand="full">
                     <ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add Time</ion-button>
             </ion-col>
         </ion-row>
@@ -117,13 +118,13 @@
             <ion-item>
                 <ion-label>Mark Absent</ion-label>
                 <ion-toggle slot="start"></ion-toggle>
-            </ion-item>-->
+            </ion-item>
             <ion-item>
             <ion-label>Mark Absent</ion-label>
             <ion-checkbox
                 slot="start" color="danger" v-model="checkIsAbsent"
                 @ionChange="markAbsent($event)">             
-            </ion-checkbox></ion-item>
+            </ion-checkbox></ion-item>-->
         </ion-row>
     </ion-grid> 
 
@@ -139,15 +140,15 @@
       </ion-col></ion-row>
 </ion-grid> 
     <ion-row>
-        <h2 style="color:red;" v-if="errorCount>0">{{errorCount}} server error(s) Found on submit.</h2>
+        <h2 style="color:red;padding:0 30px;text-align:center;" v-if="errorCount>0">{{errorCount}} server error(s) Found on submit.</h2>
     </ion-row>
     <ion-row>
-        <h2 style="color:red;" v-if="errorAbsent==true">Error Found on Mark Absent.</h2>
+        <h2 style="color:red;padding:0 30px;text-align:center;" v-if="errorAbsent==true">Error Found on Mark Absent.</h2>
     </ion-row>
     </base-layout>
 </template>
 <script>
-import {  IonCheckbox,toastController } from '@ionic/vue';
+import {  toastController } from '@ionic/vue';
 import { createOutline, closeCircleOutline, addCircleOutline  } from "ionicons/icons";
 
 export default {
@@ -163,7 +164,7 @@ export default {
     },
     components:{
         //IonList, IonItem, 
-        IonCheckbox
+        //IonCheckbox
     },
     data() {
         return {
