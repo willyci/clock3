@@ -36,12 +36,12 @@
                 <ion-col size="4"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
                     v-model="times.instructorClockInDateTime"
                     v-bind:value="times.instructorClockInDateTime"
-                    @IonChange="times.instructorClockInDateTime=$event.target.value"
+                    @IonChange="times.instructorClockInDateTime=$event.target.value;times.modify=2;"
                     ></ion-datetime></ion-col>
                 <ion-col size="4"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
                     v-model="times.instructorClockOutDateTime"
                     v-bind:value="times.instructorClockOutDateTime"
-                    @IonChange="times.instructorClockOutDateTime=$event.target.value"
+                    @IonChange="times.instructorClockOutDateTime=$event.target.value;times.modify=2;"
                     ></ion-datetime></ion-col>
                 <ion-col size="4"><ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#54595f;">
                     <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button></ion-col>
@@ -100,7 +100,34 @@
                     <ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add Time</ion-button>
             </ion-col>
         </ion-row>
+    </ion-grid>
+    
+    <ion-grid>
+        <ion-row>
+            <!--
+            <ion-col size="6">
+                <ion-button  @click="submitDelAbsent()" style="--background:#54595f;" expand="full">
+                    <ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Not Absent</ion-button>
+            </ion-col>
+            <ion-col size="6">
+                <ion-button  @click="submitAddAbsent()" style="--background:#54595f;" expand="full">
+                    <ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Mark Absent</ion-button>
+            </ion-col>
+            
+            <ion-item>
+                <ion-label>Mark Absent</ion-label>
+                <ion-toggle slot="start"></ion-toggle>
+            </ion-item>-->
+            <ion-item>
+            <ion-label>Mark Absent</ion-label>
+            <ion-checkbox
+                slot="start" color="danger" v-model="checkIsAbsent"
+                @ionChange="markAbsent($event)">             
+            </ion-checkbox></ion-item>
+        </ion-row>
     </ion-grid> 
+
+    
     <!--------->
     <ion-grid>
     <ion-row>
@@ -114,10 +141,13 @@
     <ion-row>
         <h2 style="color:red;" v-if="errorCount>0">{{errorCount}} server error(s) Found on submit.</h2>
     </ion-row>
+    <ion-row>
+        <h2 style="color:red;" v-if="errorAbsent==true">Error Found on Mark Absent.</h2>
+    </ion-row>
     </base-layout>
 </template>
 <script>
-import {  toastController } from '@ionic/vue';
+import {  IonCheckbox,toastController } from '@ionic/vue';
 import { createOutline, closeCircleOutline, addCircleOutline  } from "ionicons/icons";
 
 export default {
@@ -133,6 +163,7 @@ export default {
     },
     components:{
         //IonList, IonItem, 
+        IonCheckbox
     },
     data() {
         return {
@@ -153,6 +184,8 @@ export default {
             labSection: '',
             studentId: '',
             errorCount: 0,
+            errorAbsent: false,
+            checkIsAbsent: false
         }
     },
     methods:{
@@ -197,12 +230,15 @@ export default {
         getStudents(){
             
             this.students = this.$store.getters.getStudentList;  
-            console.log("all students = "+JSON.stringify(this.students));   
-            this.student = this.$store.getters.cuStudentList(this.$route.params.sid);
+            //console.log("all students = "+JSON.stringify(this.students));   
+            this.student = this.cleanUpData(this.$store.getters.cuStudentList(this.$route.params.sid));
             //this.studentOrig = this.$store.getters.cuStudentList(this.$route.params.sid);
             this.studentOrig = JSON.parse(JSON.stringify(this.student));
             console.log("current student = "+JSON.stringify(this.student));
             this.cuInsClass = this.$store.getters.cuInsClass(this.$route.params.cid);
+
+            
+            this.toCheckIsAbsent();
 
             /*this.classID  = this.$store.getters.cuClass(this.$route.params.id).classID;   
             this.ClassTitle = this.$store.getters.cuClass(this.$route.params.id).ClassTitle;
@@ -219,14 +255,27 @@ export default {
         removeSelectedTime(index){
             // pick selected time
             console.log(index);
+            
+            // remove instructor clock, set flag 3 for delete
+            this.student.clockHistory[index].instructorClockInDateTime = "";
+            this.student.clockHistory[index].instructorClockOutDateTime = "";
+            this.student.clockHistory[index].modify = 3;
+            
             console.log("current student = "+JSON.stringify(this.student));
+
+            /*
             var clockHistory = {};
             clockHistory = {
                 "clockId": this.student.clockHistory[index].clockId,
                 "studentClockInDateTime": this.student.clockHistory[index].studentClockInDateTime,
-                "studentClockOutDateTime": this.student.clockHistory[index].studentClockOutDateTime
+                "studentClockOutDateTime": this.student.clockHistory[index].studentClockOutDateTime,
+                "instructorClockInDateTime": "",
+                "instructorClockOutDateTime": "",
+                "isAbsent":""
+
             };
             this.student.clockHistory[index] = clockHistory;
+            */
         },
         // add time to end of list, update list
         addNewTime(){
@@ -236,11 +285,18 @@ export default {
             console.log("current student = "+JSON.stringify(this.student));
             let newTime =  new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit' }).replace(', ','T').replace(' h ',':');
             
+            // add instructor clock, set flag 1 for new
+            console.log("current student = "+JSON.stringify(this.student));
+
             var clockHistory = {};
             clockHistory = {
-                clockId:"",
+                "clockId":"",
+                "studentClockInDateTime": "",
+                "studentClockOutDateTime": "",
                 "instructorClockInDateTime":newTime,
-                "instructorClockOutDateTime":newTime
+                "instructorClockOutDateTime":newTime,
+                "isAbsent":"",
+                "modify": 1
             };
             this.student.clockHistory.push(clockHistory);
             console.log("current student with added time = "+JSON.stringify(this.student));
@@ -248,8 +304,17 @@ export default {
         },
         editSelectedTime(index) {
             console.log("current student = "+JSON.stringify(this.student));
-            var clockHistory = {};
+            //var clockHistory = {};
             let newTime =  new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit' }).replace(', ','T').replace(' h ',':');
+            
+            // remove instructor clock, set flag 3 for delete
+            this.student.clockHistory[index].instructorClockInDateTime = newTime;
+            this.student.clockHistory[index].instructorClockOutDateTime = newTime;
+            this.student.clockHistory[index].modify = 2;
+            
+            console.log("current student = "+JSON.stringify(this.student));
+            
+            /*
             clockHistory = {
                 "clockId": this.student.clockHistory[index].clockId,
                 "studentClockInDateTime": this.student.clockHistory[index].studentClockInDateTime,
@@ -259,6 +324,7 @@ export default {
             };
 
             this.student.clockHistory[index] = clockHistory;
+            */
         },
 
         onSubmit(){
@@ -266,10 +332,72 @@ export default {
             // compare student and studentOrig
             // build list of items need to commit
             // set absent or not
-            console.log("new student = "+JSON.stringify(this.student)); 
-            console.log("old student = "+JSON.stringify(this.studentOrig)); 
+            console.log("-new student = "+JSON.stringify(this.student)); 
+            console.log("-old student = "+JSON.stringify(this.studentOrig)); 
+            this.errorCount = 0;
+            this.paddingstudentOrig();
 
+            for(var i = 0; i < this.student.clockHistory.length; i++){
+                switch(this.student.clockHistory[i].modify ){
+                    case 0: console.log(i+" do nothing."); break;
+                    case 1: console.log(i+" instructorClock is new");
+                            this.submitNewTime(i);
+                            break;
+                    case 2: console.log(i+" instructorClock is updated");
+                            this.submitUpdateTime(i);
+                            break;
+                    case 3: console.log(i+" instructorClock is deleted");
+                            this.submitDelTime(i);
+                            break;
+                }  
+            }
             
+            /*
+            for(var i = 0; i < this.student.clockHistory.length; i++){
+                // instructorClock DateTime changed
+                if( (this.student.clockHistory[i].instructorClockInDateTime != this.studentOrig.clockHistory[i].instructorClockInDateTime) || 
+                    (this.student.clockHistory[i].instructorClockOutDateTime != this.studentOrig.clockHistory[i].instructorClockOutDateTime)
+                ){  
+                    
+                    
+                    // different clock, no id, new instructorClock
+                    if(this.student.clockHistory[i].clockId == "") {
+                         // has clock data
+                         if (
+                            (this.student.clockHistory[i].instructorClockInDateTime.length > 4) || 
+                            (this.student.clockHistory[i].instructorClockOutDateTime.length > 4)
+                        ) {
+                            console.log(i+" instructorClock is new");
+                            this.submitNewTime(i);
+                        }
+                    } 
+                    // different clock, got id, edit instructorClock
+                    else {
+                        // different clock, got id, new time empty, old time not empty
+                        if( ( (this.student.clockHistory[i].instructorClockInDateTime.length < 4) || 
+                              (this.student.clockHistory[i].instructorClockOutDateTime.length < 4)) &&
+                              (this.studentOrig.clockHistory[i].instructorClockInDateTime.length > 4 ||
+                               this.studentOrig.clockHistory[i].instructorClockOutDateTime.length > 4 )
+                        ){ 
+                            console.log(i+" instructorClock is deleted");
+                            this.submitDelTime(i);
+                        }
+
+                        // different clock, got id, has time, update time.  
+                        else if (
+                            (this.student.clockHistory[i].instructorClockInDateTime.length > 4) || 
+                            (this.student.clockHistory[i].instructorClockOutDateTime.length > 4)
+                        ) {                        
+                            console.log(i+" instructorClock is updated");
+                            this.submitUpdateTime(i)
+                        }
+                    }
+                } else {
+                    console.log(i+" do nothing.");
+                }
+            }
+            */
+            /*
             for(var i = 0; i < this.student.clockHistory.length; i++){
                 if( this.student.clockHistory[i].instructorClockInDateTime != undefined && (
                     this.student.clockHistory[i].instructorClockInDateTime.length > 4 ||
@@ -300,6 +428,7 @@ export default {
                     console.log(i+" do nothing.");
                 }
             }
+            
 
             // set absent flag
             if(this.hasClock()) {
@@ -307,7 +436,7 @@ export default {
             } else {
                 this.submitAddAbsent();
             }
-
+            */
 
         },
 
@@ -321,34 +450,33 @@ export default {
                 headers: { 'Content-Type': 'application/json', 
                            'Authorization': 'Bearer '+ this.$store.getters.getToken}
             };
-            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+            
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+
                 "semester=" + this.cuInsClass.semester + 
                 "&courseNumber=" + this.cuInsClass.courseNumber +
                 "&courseSection=" + this.cuInsClass.courseSection +
                 "&labSection=" + this.cuInsClass.labSection +
                 "&date=" + this.getTodayDay() +
                 "&studentId=" + this.student.studentId +
-                "&colckIn=" + this.student.clockHistory[index].instructorClockInDateTime +
+                "&clockIn=" + this.student.clockHistory[index].instructorClockInDateTime +
                 "&clockOut=" +  this.student.clockHistory[index].instructorClockOutDateTime
                 , requestOptions)
                 .then(async response => {
-                const data = await response.json();
+                //const data = await response.json();
 
                 // check for error response
                 if (!response.ok) {
                     // get error message from body or default to response status
-                    const error = (data && data.message) || response.status;
+                    //const error = (data && data.message) || response.status;
                     this.errorCount++;
-                    return Promise.reject(error);
-                    
+                    return Promise.reject(response.status);                    
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                 console.log("added new time "+index);
                 })
                 .catch(error => {
-                this.errorMessage = error;
-                console.error('There was an error!', error);
-                this.errorCount++;
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.errorCount++;
                 });
         },
 
@@ -362,7 +490,7 @@ export default {
                 headers: { 'Content-Type': 'application/json', 
                            'Authorization': 'Bearer '+ this.$store.getters.getToken}
             };
-            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+            
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+
                 "semester=" + this.cuInsClass.semester + 
                 "&courseNumber=" + this.cuInsClass.courseNumber +
                 "&courseSection=" + this.cuInsClass.courseSection +
@@ -370,18 +498,18 @@ export default {
                 "&date=" + this.getTodayDay() +
                 "&studentId=" + this.student.studentId +
                 "&clockId=" + this.student.clockHistory[index].clockId +
-                "&colckIn=" + this.student.clockHistory[index].instructorClockInDateTime +
+                "&clockIn=" + this.student.clockHistory[index].instructorClockInDateTime +
                 "&clockOut=" +  this.student.clockHistory[index].instructorClockOutDateTime
                 , requestOptions)
                 .then(async response => {
-                const data = await response.json();
+                //const data = await response.json();
 
                 // check for error response
                 if (!response.ok) {
                     // get error message from body or default to response status
-                    const error = (data && data.message) || response.status;
+                    //const error = (data && data.message) || response.status;
                     this.errorCount++;
-                    return Promise.reject(error);
+                    return Promise.reject(response.status);
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                     console.log("updated old time"+index);
@@ -405,7 +533,7 @@ export default {
                 headers: { 'Content-Type': 'application/json', 
                            'Authorization': 'Bearer '+ this.$store.getters.getToken}
             };
-            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+            
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentClockTime?'+
                 "semester=" + this.cuInsClass.semester + 
                 "&courseNumber=" + this.cuInsClass.courseNumber +
                 "&courseSection=" + this.cuInsClass.courseSection +
@@ -415,14 +543,14 @@ export default {
                 "&clockId=" + this.student.clockHistory[index].clockId 
                 , requestOptions)
                 .then(async response => {
-                const data = await response.json();
+                //const data = await response.json();
 
                 // check for error response
                 if (!response.ok) {
                     // get error message from body or default to response status
-                    const error = (data && data.message) || response.status;
+                    //const error = (data && data.message) || response.status;
                     this.errorCount++;
-                    return Promise.reject(error);
+                    return Promise.reject(response.status);
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                     console.log("updated old time"+index);
@@ -445,7 +573,7 @@ export default {
                 headers: { 'Content-Type': 'application/json', 
                            'Authorization': 'Bearer '+ this.$store.getters.getToken}
             };
-            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+            
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+
                 "semester=" + this.cuInsClass.semester + 
                 "&courseNumber=" + this.cuInsClass.courseNumber +
                 "&courseSection=" + this.cuInsClass.courseSection +
@@ -454,22 +582,25 @@ export default {
                 "&studentId=" + this.student.studentId
                 , requestOptions)
                 .then(async response => {
-                const data = await response.json();
+                //const data = await response.json();
 
                 // check for error response
                 if (!response.ok) {
                     // get error message from body or default to response status
-                    const error = (data && data.message) || response.status;
+                    //const error = (data && data.message) || response.status;
                     this.errorCount++;
-                    return Promise.reject(error);
+                    this.errorAbsent = true;
+                    return Promise.reject(response.status);
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                     console.log("mark absent Y");
+                    this.errorAbsent = false;
                 })
                 .catch(error => {
                     this.errorMessage = error;
                     console.error('There was an error!', error);
                     this.errorCount++;
+                    this.errorAbsent = true;
                 });
         },
 
@@ -484,7 +615,7 @@ export default {
                 headers: { 'Content-Type': 'application/json', 
                            'Authorization': 'Bearer '+ this.$store.getters.getToken}
             };
-            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+            
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+
                 "semester=" + this.cuInsClass.semester + 
                 "&courseNumber=" + this.cuInsClass.courseNumber +
                 "&courseSection=" + this.cuInsClass.courseSection +
@@ -494,28 +625,44 @@ export default {
                 "&clockId=" + this.student.clockHistory[0].clockId
                 , requestOptions)
                 .then(async response => {
-                const data = await response.json();
+                //const data = await response.json();
 
                 // check for error response
                 if (!response.ok) {
                     // get error message from body or default to response status
-                    const error = (data && data.message) || response.status;
+                    //const error = (data && data.message) || response.status;
                     this.errorCount++;
-                    return Promise.reject(error);
+                    this.errorAbsent = true;
+                    return Promise.reject(response.status);
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                     console.log("mark absent N");
+                    this.errorAbsent = false;
                 })
                 .catch(error => {
                     this.errorMessage = error;
                     console.error('There was an error!', error);
                     this.errorCount++;
+                    this.errorAbsent = true;
                 });
         },
 
+        // check if the clockhistory is empty
         hasClock(){
-            if(this.student.clockHistory.length > 1 ) {
-                // has studnet clock
+            var flag = false;
+            if(this.student.clockHistory.length > 0 ) {
+                for(var i =0; i < this.student.clockHistory.length; i++){
+                    if( this.student.clockHistory[i].studentClockInDateTime.length > 4 ||
+                        this.student.clockHistory[i].studentClockOutDateTime.length > 4 ||
+                        this.student.clockHistory[i].instructorClockInDateTime.length > 4 ||
+                        this.student.clockHistory[i].instructorClockOutDateTime.length > 4                    
+                    ) { flag = true; }
+                }
+                return flag;
+            } else { return flag; }
+            
+            /*if(this.student.clockHistory.length > 1 ) {
+                // has student clock
                 if(
                     this.student.clockHistory[0].clockId != undefined && 
                     this.student.clockHistory[0].clockId != "" && 
@@ -535,6 +682,80 @@ export default {
                 else {return false;}
             }
              else {return false;}
+             */
+        },
+
+        // cleanup student data, fill place holder with ""
+        cleanUpData(student) {
+            if(student.clockHistory.length>0){
+                for(var i =0; i < student.clockHistory.length; i++){
+                    if(student.clockHistory[i].clockId == undefined) {
+                        student.clockHistory[i]["clockId"] = "";
+                    }                    
+                    if(student.clockHistory[i].studentClockInDateTime == undefined) {
+                        student.clockHistory[i]["studentClockInDateTime"] = "";
+                    }
+                    if(student.clockHistory[i].studentClockOutDateTime == undefined) {
+                        student.clockHistory[i]["studentClockOutDateTime"] = "";
+                    }
+                    if(student.clockHistory[i].instructorClockInDateTime == undefined) {
+                        student.clockHistory[i]["instructorClockInDateTime"] = "";
+                    }
+                    if(student.clockHistory[i].instructorClockOutDateTime == undefined) {
+                        student.clockHistory[i]["instructorClockOutDateTime"] = "";
+                    }                    
+                    if(student.clockHistory[i].isAbsent == undefined) {
+                        student.clockHistory[i]["isAbsent"] = "";
+                    }
+                    
+                    student.clockHistory[i]["modify"] = 0;
+                    // 0 = unchanged
+                    // 1 = new 
+                    // 2 = edit
+                    // 3 = del
+
+                }
+            }
+
+            return student;
+        },
+
+        paddingstudentOrig(){
+            if(this.student.clockHistory.length > this.studentOrig.clockHistory.length) {
+                for(var i=0;i  < (this.student.clockHistory.length - this.studentOrig.clockHistory.length); i++ ){
+                    this.studentOrig.clockHistory.push({
+                        "clockId": "",
+                        "studentClockInDateTime": "",
+                        "studentClockOutDateTime": "",
+                        "instructorClockInDateTime": "",
+                        "instructorClockOutDateTime": "",
+                        "isAbsent": "",
+                        "modify": 0
+                    })
+                }
+            }
+        },
+
+        markAbsent(e) {
+            console.log(e.detail.checked);
+            // set absent flag
+            if(e.detail.checked) {
+                this.submitAddAbsent();
+            } else {
+                this.submitDelAbsent();
+            }
+        },
+
+        toCheckIsAbsent() {
+            if(this.student.clockHistory.length>0){
+                for(var i =0; i < this.student.clockHistory.length; i++){                    
+                    if(this.student.clockHistory[i].isAbsent == "Y") {
+                        this.checkIsAbsent = true;
+                    }                
+                }                
+            } else if (this.student.clockHistory.length == 0) {
+                this.checkIsAbsent = true;
+            }        
         },
 
 
@@ -573,3 +794,18 @@ export default {
     
 }
 </script>
+
+<!--
+<style>
+ion-toggle {
+  --background: rgb(6, 255, 68);
+  --background-checked: red;
+
+  --handle-background: #ffffff;
+  --handle-background-checked: #ffffff;
+
+  width: 50px;
+}
+</style>
+
+-->

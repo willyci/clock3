@@ -46,7 +46,7 @@
                     >
                         <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
                     </ion-row>
-                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 1 &&  student.clockHistory[0].isAbsent == 'Y'"
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length >= 1 &&  student.clockHistory[student.clockHistory.length-1].isAbsent == 'Y'"
                     @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
                     >
                         <ion-col size="12"><span style="color:red;">Absent</span></ion-col>

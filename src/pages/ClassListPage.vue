@@ -442,17 +442,17 @@ export default {
       }
   },
   beforeMount:function () {
-    console.log('--classlistpage beforeMount');
+    console.log('classlistpage beforeMount');
   },
   Created:function () {
-    console.log('--classlistpage Created');
+    console.log('classlistpage Created');
     //this.$root.$refs.ClassListPage = this;
   },
   Updated:function () {
-    console.log('--classlistpage Updated');
+    console.log('classlistpage Updated');
   },
   onUpdated:function () {
-    console.log('--onUpdated Updated');
+    console.log('onUpdated Updated');
   },
   watch:{
      $route (to,from){
