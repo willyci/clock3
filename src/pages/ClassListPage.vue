@@ -62,24 +62,28 @@
       class="course-block"
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
-          <ion-text style="margin: 5px 0px;">          
-            <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span>
-            <span v-if="cuClass.clockHistory.length>0" style="float: right;font-size:12px;">
-            <span>{{changeTimeTo12((cuClass.clockHistory)[0].studentClockInDateTime)}} - </span>
-            <span>{{changeTimeTo12((cuClass.clockHistory)[0].studentClockOutDateTime)}}</span>
-            </span>
-            <br/>
-            <span>{{ cuClass.title }} </span>  
-            <span> ( {{ cuClass.courseNumber }} )</span>
+
+            <ion-col size="6" style="float: left;font-size:12px;">
+              {{ changeTimeTo12(cuClass.start) }}
+            </ion-col>
+            <ion-col size="6" style="float: right;font-size:12px;"> 
+              <span v-if="cuClass.clockHistory.length>0" style="float: right;font-size:12px;">
+              <span>{{changeTimeTo12((cuClass.clockHistory)[cuClass.clockHistory.length-1].studentClockInDateTime)}} - </span>
+              <span>{{changeTimeTo12((cuClass.clockHistory)[cuClass.clockHistory.length-1].studentClockOutDateTime)}}</span>
+              </span>
+            </ion-col>
+
+          <ion-text style="margin: 0px 5px 5px 5px;">
+            <span style="width:100%;">{{ cuClass.title }} ( {{ cuClass.courseNumber }} )</span>
             <!--<br/><span>{{cuClass.activeForClockInOut}}</span>-->
-          </ion-text>        
+          </ion-text>     
     </ion-row>
 
     <ion-row style="background:#727272;margin:15px 10px;"   v-if="cuClass.activeForClockInOut!='Y'"   
       class="course-block"
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
-          <ion-text style="margin: 5px 0px;">          
+          <ion-text style="margin: 0px 5px 5px 5px;">          
             <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
             <span>{{ cuClass.title }} </span>  
             <span> ( {{ cuClass.courseNumber }} )</span>
