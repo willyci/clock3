@@ -41,16 +41,18 @@
                             </ion-col>
                         
                     </ion-row>
-                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 0 "
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 0 || student.clockHistory.isAbsent == 'Y'"
                     @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
                     >
                         <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
                     </ion-row>
-                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length >= 1 &&  student.clockHistory[student.clockHistory.length-1].isAbsent == 'Y'"
+                    <!--
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length >= 1 &&  student.clockHistory.isAbsent == 'Y'"
                     @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
                     >
                         <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
                     </ion-row>
+                    -->
                 </ion-col>
             </ion-row>    
         </ion-grid>
@@ -196,7 +198,7 @@ export default {
                         this.classID = this.cuInsClass.courseNumber;
                         this.classStartTime = this.changeTimeTo12(this.cuInsClass.startDateTime);
                         this.classEndTime = this.changeTimeTo12(this.cuInsClass.endDateTime);
-                        this.studentList = data.students;
+                        this.studentList = this.cleanupStudentData(data);
                         this.$store.commit("addStudentList",data.students);
                     }
                 })
@@ -283,6 +285,54 @@ export default {
                     //console.log(hh+":"+mm+AMPM);
                     return hh+":"+mm+AMPM;
                 }
+            },
+
+            cleanupStudentData(cuClass){
+                var students = cuClass.students;
+                if(cuClass.students.length > 0) {
+                    for (var i = 0; i < cuClass.students.length; i++){
+                             //console.log("i="+i);                            
+                            if(cuClass.students[i].clockHistory.length > 0) {
+                                for (var j = 0; j < cuClass.students[i].clockHistory.length; j++){
+                                    //console.log("j="+j);
+                                    if(cuClass.students[i].clockHistory[j].clockId == undefined) {
+                                        cuClass.students[i].clockHistory[j]["clockId"] = "";
+                                    }                                    
+                                    if(cuClass.students[i].clockHistory[j].instructorClockInDateTime == undefined) {
+                                        cuClass.students[i].clockHistory[j]["instructorClockInDateTime"] = "";
+                                    }
+                                    if(cuClass.students[i].clockHistory[j].instructorClockOutDateTime == undefined) {
+                                        cuClass.students[i].clockHistory[j]["instructorClockOutDateTime"] = "";
+                                    }
+                                    if(cuClass.students[i].clockHistory[j].studentClockInDateTime == undefined) {
+                                        cuClass.students[i].clockHistory[j]["studentClockInDateTime"] = cuClass.students[i].clockHistory[j].instructorClockInDateTime;
+                                    } else {
+                                        cuClass.students[i].clockHistory[j]["studentClockInDateTime"] = cuClass.students[i].clockHistory[j].instructorClockInDateTime;
+                                    }
+                                    if(cuClass.students[i].clockHistory[j].studentClockOutDateTime == undefined) {
+                                        cuClass.students[i].clockHistory[j]["studentClockOutDateTime"] = students[i].clockHistory[j].instructorClockOutDateTime;
+                                    } else {
+                                        cuClass.students[i].clockHistory[j]["studentClockOutDateTime"] = students[i].clockHistory[j].instructorClockOutDateTime;
+                                    }
+                                    if(cuClass.students[i].clockHistory[j].isAbsent == undefined) {
+                                        cuClass.students[i].clockHistory[j]["isAbsent"] = "";
+                                    }                                    
+                                    if(cuClass.students[i].clockHistory[j].isAbsent == "Y") {
+                                        if(cuClass.students[i].isAbsent == undefined) {
+                                            // set isAbsent flag on the outside
+                                            cuClass.students[i]["isAbsent"] = "Y";
+                                        }
+                                        console.log("isAbsent flag got");
+                                    }
+                                    //console.log("j="+j);   
+                            }
+                            //console.log("i="+i);
+                        } else {
+                            //console.log("no clock found")
+                        }                   
+                    }
+                } else { console.log('no students found'); }
+                return cuClass.students;
             },
     },
     mounted: function () {

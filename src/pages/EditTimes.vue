@@ -25,6 +25,7 @@
 
     <ion-grid>
         <div v-for="(times, index) in student.clockHistory" :key="times.clockId">
+            <!--
             <ion-row v-if="times.studentClockInDateTime != null && times.studentClockInDateTime != undefined && times.studentClockInDateTime != ''">
                 
                 <ion-col size="4"><span style="color:gray;padding-left: 15px;text-align:center;">{{changeTimeTo12(times.studentClockInDateTime)}}</span></ion-col>
@@ -32,6 +33,7 @@
                 <ion-col size="4" style="text-align: center;"><ion-button  @click="editSelectedTime(index)" style="height:24px;--background:#517FC8;">
                     <ion-icon  slot="icon-only" :icon="createOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
+            -->
             <ion-row v-if="times.instructorClockInDateTime != null && times.instructorClockInDateTime != undefined && times.instructorClockInDateTime != ''">
                 <!--<ion-col size="4"><span>{{changeTimeTo12(times.instructorClockInDateTime)}}</span></ion-col>
                 <ion-col size="4"><span>{{changeTimeTo12(times.instructorClockOutDateTime)}}</span></ion-col>-->
@@ -39,17 +41,17 @@
                     <ion-datetime display-format="h:mm A" picker-format="h:mm A" 
                     v-model="times.instructorClockInDateTime"
                     v-bind:value="times.instructorClockInDateTime"
-                    @IonChange="times.instructorClockInDateTime=$event.target.value;times.modify=2;"
+                    @IonChange="times.instructorClockInDateTime=$event.target.value;times.modify=2;anythingChanged=true;"
                     ></ion-datetime></ion-col>
                 <ion-col size="4" style="text-align: center;"><ion-datetime display-format="h:mm A" picker-format="h:mm A" 
                     v-model="times.instructorClockOutDateTime"
                     v-bind:value="times.instructorClockOutDateTime"
-                    @IonChange="times.instructorClockOutDateTime=$event.target.value;times.modify=2;"
+                    @IonChange="times.instructorClockOutDateTime=$event.target.value;times.modify=2;anythingChanged=true;"
                     ></ion-datetime></ion-col>
-                <ion-col size="4" style="text-align: center;"><ion-button  @click="removeSelectedTime(index)" style="height:24px;--background:#517FC8;">
+                <ion-col size="4" style="text-align: center;"><ion-button v-if="times.canDel == true"  @click="removeSelectedTime(index)" style="height:24px;--background:#517FC8;">
                     <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
-            <hr style="border-width: 1px; margin: 0 20px;"/>
+            <!--<hr style="border-width: 1px; margin: 0 20px;"/>-->
         </div>
     </ion-grid>
     <!--
@@ -132,7 +134,7 @@
 
     
     <!--------->
-    <ion-grid>
+    <ion-grid v-if="anythingChanged==true">
     <ion-row>
       <ion-col size="12">
           <ion-button expand="block" @click="onSubmit" style="--background:#ff796a;">
@@ -188,7 +190,9 @@ export default {
             studentId: '',
             errorCount: 0,
             errorAbsent: false,
-            checkIsAbsent: false
+            checkIsAbsent: false,
+            anythingChanged: false,
+            actionCount: 0,
         }
     },
     methods:{
@@ -265,7 +269,7 @@ export default {
             this.student.clockHistory[index].modify = 3;
             
             console.log("current student = "+JSON.stringify(this.student));
-
+            this.anythingChanged = true;
             /*
             var clockHistory = {};
             clockHistory = {
@@ -299,10 +303,12 @@ export default {
                 "instructorClockInDateTime":newTime,
                 "instructorClockOutDateTime":newTime,
                 "isAbsent":"",
-                "modify": 1
+                "modify": 1,
+                "canDel": true
             };
             this.student.clockHistory.push(clockHistory);
             console.log("current student with added time = "+JSON.stringify(this.student));
+            this.anythingChanged = true;
 
         },
         editSelectedTime(index) {
@@ -316,6 +322,7 @@ export default {
             this.student.clockHistory[index].modify = 2;
             
             console.log("current student = "+JSON.stringify(this.student));
+            this.anythingChanged = true;
             
             /*
             clockHistory = {
@@ -344,12 +351,15 @@ export default {
                 switch(this.student.clockHistory[i].modify ){
                     case 0: console.log(i+" do nothing."); break;
                     case 1: console.log(i+" instructorClock is new");
+                            this.actionCount++;
                             this.submitNewTime(i);
                             break;
                     case 2: console.log(i+" instructorClock is updated");
+                            this.actionCount++;
                             this.submitUpdateTime(i);
                             break;
                     case 3: console.log(i+" instructorClock is deleted");
+                            this.actionCount++;
                             this.submitDelTime(i);
                             break;
                 }  
@@ -471,15 +481,18 @@ export default {
                     // get error message from body or default to response status
                     //const error = (data && data.message) || response.status;
                     this.errorCount++;
+                    this.openToastFailed();
                     return Promise.reject(response.status);                    
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                 console.log("added new time "+index);
+                this.openToastSuccessful();
                 })
                 .catch(error => {
                     this.errorMessage = error;
                     console.error('There was an error!', error);
                     this.errorCount++;
+                    this.openToastFailed();
                 });
         },
 
@@ -512,15 +525,18 @@ export default {
                     // get error message from body or default to response status
                     //const error = (data && data.message) || response.status;
                     this.errorCount++;
+                    this.openToastFailed();
                     return Promise.reject(response.status);
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                     console.log("updated old time"+index);
+                    this.openToastSuccessful();
                 })
                 .catch(error => {
                     this.errorMessage = error;
                     console.error('There was an error!', error);
                     this.errorCount++;
+                    this.openToastFailed();
                 });
         },
 
@@ -553,15 +569,18 @@ export default {
                     // get error message from body or default to response status
                     //const error = (data && data.message) || response.status;
                     this.errorCount++;
+                    this.openToastFailed();
                     return Promise.reject(response.status);
                 }
                 //console.log("ins classes = " + JSON.stringify(data.classes));
                     console.log("updated old time"+index);
+                    this.openToastSuccessful();
                 })
                 .catch(error => {
                     this.errorMessage = error;
                     console.error('There was an error!', error);
                     this.errorCount++;
+                    this.openToastFailed();
                 });
         },
 
@@ -702,15 +721,25 @@ export default {
                         student.clockHistory[i]["studentClockOutDateTime"] = "";
                     }
                     if(student.clockHistory[i].instructorClockInDateTime == undefined) {
-                        student.clockHistory[i]["instructorClockInDateTime"] = "";
+                        student.clockHistory[i]["instructorClockInDateTime"] = student.clockHistory[i]["studentClockInDateTime"];
                     }
                     if(student.clockHistory[i].instructorClockOutDateTime == undefined) {
-                        student.clockHistory[i]["instructorClockOutDateTime"] = "";
+                        student.clockHistory[i]["instructorClockOutDateTime"] = student.clockHistory[i]["studentClockOutDateTime"];
                     }                    
                     if(student.clockHistory[i].isAbsent == undefined) {
                         student.clockHistory[i]["isAbsent"] = "";
                     }
                     
+                    // copy studentClock to instructorClock, 
+                    // add canDel flag to false if both studentClock == ""
+                    if(student.clockHistory[i]["studentClockOutDateTime"] !="" || student.clockHistory[i]["studentClockInDateTime"] != "") {
+                        student.clockHistory[i]["canDel"] = false;
+                    } else if ( student.clockHistory[i]["studentClockOutDateTime"] =="" && student.clockHistory[i]["studentClockInDateTime"] == "" ) {
+                        student.clockHistory[i]["canDel"] = true;
+                    }
+                    
+
+
                     student.clockHistory[i]["modify"] = 0;
                     // 0 = unchanged
                     // 1 = new 
@@ -763,6 +792,8 @@ export default {
 
 
             async openToastSuccessful() {
+            this.actionCount--;
+                if(this.actionCount == 0){
             const toast = await toastController
                 .create({
                 message: 'Submit Successful.',
@@ -771,9 +802,11 @@ export default {
                 color: 'success'
                 })
             toast.present();
-            toast.onDidDismiss().then(()=>{
-                this.$router.go(-1);
-            })
+            
+                    toast.onDidDismiss().then(()=>{
+                        this.$router.go(-1);
+                    })
+                }
             },
             
 

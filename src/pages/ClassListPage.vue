@@ -8,9 +8,9 @@
         <ion-col size="12" style="text-align: center">          
           <!--<h4>Class Schedule</h4>-->
           <h2 style="font-weight:bold;">{{userName}}</h2>
-          <h2 style="margin:0px;margin-top: 10px;">Today</h2>
-          <h2 style="margin:0px;margin-top: 10px;font-weight:bold;">{{ currentDate }}</h2>
-          <h2 style="margin:0px;margin-top: 10px;font-weight:bold;padding-bottom:10px;">{{ currentTime}}</h2>
+          <h2 style="margin:0px;margin-top: 10px;">Today</h2>          
+          <h2 style="margin:0px;margin-top: 0px;font-weight:bold;">{{ currentTime}}</h2>
+          <h2 style="margin:0px;margin-top: 0px;font-weight:bold;">{{ currentDate }}</h2>
           <h2 style="margin:0px;margin-top: 10px;font-weight:bold;padding-bottom:10px;color:red;" v-if="!hasClass">No class found</h2>
         </ion-col>
       </ion-row>
