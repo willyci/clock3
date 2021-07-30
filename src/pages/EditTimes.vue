@@ -237,7 +237,7 @@ export default {
         getStudents(){
             
             this.students = this.$store.getters.getStudentList;  
-            //console.log("all students = "+JSON.stringify(this.students));   
+            console.log("all students = "+JSON.stringify(this.students));   
             this.student = this.cleanUpData(this.$store.getters.cuStudentList(this.$route.params.sid));
             //this.studentOrig = this.$store.getters.cuStudentList(this.$route.params.sid);
             this.studentOrig = JSON.parse(JSON.stringify(this.student));
@@ -720,23 +720,30 @@ export default {
                     if(student.clockHistory[i].studentClockOutDateTime == undefined) {
                         student.clockHistory[i]["studentClockOutDateTime"] = "";
                     }
-                    if(student.clockHistory[i].instructorClockInDateTime == undefined) {
+
+                    // copy studentClock to instructorClock, 
+                    // add canDel flag to false if both studentClock == ""
+                    /*
+                    if(student.clockHistory[i].canDel != undefined) {
+                        if(student.clockHistory[i]["studentClockOutDateTime"] !="" || student.clockHistory[i]["studentClockInDateTime"] != "") {
+                            student.clockHistory[i]["canDel"] = false;
+                        } else if ( student.clockHistory[i]["studentClockOutDateTime"] =="" && student.clockHistory[i]["studentClockInDateTime"] == "" ) {
+                            student.clockHistory[i]["canDel"] = true;
+                        }
+                    }
+                    */
+
+                    if(student.clockHistory[i].instructorClockInDateTime == undefined || student.clockHistory[i].instructorClockInDateTime == "") {
                         student.clockHistory[i]["instructorClockInDateTime"] = student.clockHistory[i]["studentClockInDateTime"];
                     }
-                    if(student.clockHistory[i].instructorClockOutDateTime == undefined) {
+                    if(student.clockHistory[i].instructorClockOutDateTime == undefined || student.clockHistory[i].instructorClockOutDateTime == "") {
                         student.clockHistory[i]["instructorClockOutDateTime"] = student.clockHistory[i]["studentClockOutDateTime"];
                     }                    
                     if(student.clockHistory[i].isAbsent == undefined) {
                         student.clockHistory[i]["isAbsent"] = "";
                     }
                     
-                    // copy studentClock to instructorClock, 
-                    // add canDel flag to false if both studentClock == ""
-                    if(student.clockHistory[i]["studentClockOutDateTime"] !="" || student.clockHistory[i]["studentClockInDateTime"] != "") {
-                        student.clockHistory[i]["canDel"] = false;
-                    } else if ( student.clockHistory[i]["studentClockOutDateTime"] =="" && student.clockHistory[i]["studentClockInDateTime"] == "" ) {
-                        student.clockHistory[i]["canDel"] = true;
-                    }
+                    
                     
 
 
@@ -748,7 +755,7 @@ export default {
 
                 }
             }
-
+            console.log("after cleanup student = "+JSON.stringify(student));
             return student;
         },
 

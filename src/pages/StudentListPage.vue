@@ -297,23 +297,33 @@ export default {
                                     //console.log("j="+j);
                                     if(cuClass.students[i].clockHistory[j].clockId == undefined) {
                                         cuClass.students[i].clockHistory[j]["clockId"] = "";
-                                    }                                    
+                                    }
+                                    
+                                    // setup empty instructor time
                                     if(cuClass.students[i].clockHistory[j].instructorClockInDateTime == undefined) {
                                         cuClass.students[i].clockHistory[j]["instructorClockInDateTime"] = "";
                                     }
                                     if(cuClass.students[i].clockHistory[j].instructorClockOutDateTime == undefined) {
                                         cuClass.students[i].clockHistory[j]["instructorClockOutDateTime"] = "";
                                     }
-                                    if(cuClass.students[i].clockHistory[j].studentClockInDateTime == undefined) {
+                                    
+                                    // if student clock is empty, set canDel to true
+                                    if((cuClass.students[i].clockHistory[j].studentClockInDateTime == undefined && cuClass.students[i].clockHistory[j].studentClockOutDateTime == undefined) ||
+                                        (cuClass.students[i].clockHistory[j].studentClockInDateTime == "" && cuClass.students[i].clockHistory[j].studentClockOutDateTime == "") ) {
+                                            cuClass.students[i].clockHistory[j]["canDel"] = true;
+                                        } else {
+                                            cuClass.students[i].clockHistory[j]["canDel"] = false;
+                                        }
+                                    
+                                    // if instructor clock not empty, over write student clock
+                                    if(cuClass.students[i].clockHistory[j]["instructorClockInDateTime"] != "") {
                                         cuClass.students[i].clockHistory[j]["studentClockInDateTime"] = cuClass.students[i].clockHistory[j].instructorClockInDateTime;
-                                    } else {
-                                        cuClass.students[i].clockHistory[j]["studentClockInDateTime"] = cuClass.students[i].clockHistory[j].instructorClockInDateTime;
-                                    }
-                                    if(cuClass.students[i].clockHistory[j].studentClockOutDateTime == undefined) {
+                                    } 
+                                    if(cuClass.students[i].clockHistory[j]["instructorClockOutDateTime"] != "") {
                                         cuClass.students[i].clockHistory[j]["studentClockOutDateTime"] = students[i].clockHistory[j].instructorClockOutDateTime;
-                                    } else {
-                                        cuClass.students[i].clockHistory[j]["studentClockOutDateTime"] = students[i].clockHistory[j].instructorClockOutDateTime;
-                                    }
+                                    } 
+
+                                    // setup isAbsent flag
                                     if(cuClass.students[i].clockHistory[j].isAbsent == undefined) {
                                         cuClass.students[i].clockHistory[j]["isAbsent"] = "";
                                     }                                    
@@ -332,6 +342,7 @@ export default {
                         }                   
                     }
                 } else { console.log('no students found'); }
+                console.log("student list after cleanup" + JSON.stringify(cuClass.students));
                 return cuClass.students;
             },
     },
