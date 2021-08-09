@@ -58,7 +58,30 @@
   <div v-for="cuClass in studentClasses"
       :key="cuClass.id">
 
+    <ion-row style="background:white;color:black;margin:15px 10px;"   v-if="cuClass.courseNumber == undefined "   
+      class="course-block"
+    >
+          <ion-text style="margin: 0px 5px 5px 5px;">          
+            <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
+            <span>{{ cuClass.title }} </span>  
+            <span> ( {{ cuClass.courseNumber }} )</span>
+          </ion-text>        
+    </ion-row>
+    
+    <ion-row style="background:#727272;margin:15px 10px;"   v-if="cuClass.activeForClockInOut!='Y' && cuClass.courseNumber != undefined "   
+      class="course-block"
+      @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
+    >
+          <ion-text style="margin: 0px 5px 5px 5px;">          
+            <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
+            <span>{{ cuClass.title }} </span>  
+            <span> ( {{ cuClass.courseNumber }} )</span>
+          </ion-text>        
+    </ion-row>
+    <!--
     <ion-row style="background:#517FC8;margin:15px 10px;"   v-if="cuClass.activeForClockInOut=='Y'"   
+    -->
+    <ion-row style="background:#517FC8;margin:15px 10px;"  v-if="cuClass.activeForClockInOut=='Y' && cuClass.courseNumber != undefined " 
       class="course-block"
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
@@ -79,16 +102,7 @@
           </ion-text>     
     </ion-row>
 
-    <ion-row style="background:#727272;margin:15px 10px;"   v-if="cuClass.activeForClockInOut!='Y'"   
-      class="course-block"
-      @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
-    >
-          <ion-text style="margin: 0px 5px 5px 5px;">          
-            <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
-            <span>{{ cuClass.title }} </span>  
-            <span> ( {{ cuClass.courseNumber }} )</span>
-          </ion-text>        
-    </ion-row>
+    
   </div>
 
 </ion-grid> 

@@ -15,11 +15,11 @@
     <!--------->
     <ion-grid>
         <ion-row>
-            <ion-col size='4' style="text-align:center;">IN</ion-col>
+            <ion-col size='5' style="text-align:center;">IN</ion-col>
             <ion-col size='4' style="text-align:center;">OUT</ion-col>
-            <ion-col size='4' style="margin-left:25px;text-align:center;"></ion-col>
-        </ion-row>        
-    </ion-grid> 
+            <ion-col size='3' style="margin-left:25px;text-align:center;"></ion-col>
+        </ion-row>
+    </ion-grid>
     <hr style="border-width: 1px; margin: 0 20px;"/>
     <!--------->
 
@@ -37,7 +37,7 @@
             <ion-row v-if="times.instructorClockInDateTime != null && times.instructorClockInDateTime != undefined && times.instructorClockInDateTime != ''">
                 <!--<ion-col size="4"><span>{{changeTimeTo12(times.instructorClockInDateTime)}}</span></ion-col>
                 <ion-col size="4"><span>{{changeTimeTo12(times.instructorClockOutDateTime)}}</span></ion-col>-->
-                <ion-col size="4" style="text-align: center;">
+                <ion-col size="5" style="text-align: center;">
                     <ion-datetime display-format="h:mm A" picker-format="h:mm A" 
                     v-model="times.instructorClockInDateTime"
                     v-bind:value="times.instructorClockInDateTime"
@@ -48,7 +48,7 @@
                     v-bind:value="times.instructorClockOutDateTime"
                     @IonChange="times.instructorClockOutDateTime=$event.target.value;times.modify=2;anythingChanged=true;"
                     ></ion-datetime></ion-col>
-                <ion-col size="4" style="text-align: center;"><ion-button v-if="times.canDel == true"  @click="removeSelectedTime(index)" style="height:24px;--background:#517FC8;">
+                <ion-col size="3" style="text-align: center;"><ion-button v-if="times.canDel == true"  @click="removeSelectedTime(index)" style="height:26px;--background:#517FC8;">
                     <ion-icon  slot="icon-only" :icon="closeCircleOutline"></ion-icon></ion-button></ion-col>
             </ion-row>
             <!--<hr style="border-width: 1px; margin: 0 20px;"/>-->
@@ -101,7 +101,7 @@
     <ion-grid>
         <ion-row>
             <ion-col size="12">
-                <ion-button  @click="addNewTime(student)" style="--background:#517FC8;padding:0 90px;" expand="full">
+                <ion-button  @click="addNewTime(student)" style="--background:#517FC8;padding:0 90px;" expand="block">
                     <ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Add Time</ion-button>
             </ion-col>
         </ion-row>
