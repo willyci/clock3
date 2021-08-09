@@ -64,7 +64,6 @@
           <ion-text style="margin: 0px 5px 5px 5px;">          
             <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
             <span>{{ cuClass.title }} </span>  
-            <span> ( {{ cuClass.courseNumber }} )</span>
           </ion-text>        
     </ion-row>
     
