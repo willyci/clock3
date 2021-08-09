@@ -7,6 +7,7 @@
       <ion-row>
         <ion-col size="12" style="text-align: center">          
           <!--<h4>Class Schedule</h4>-->
+          <ion-spinner color="primary" v-if="stillLoading == true"></ion-spinner>
           <h2 style="font-weight:bold;">{{userName}}</h2>
           <h2 style="margin:0px;margin-top: 10px;">Today</h2>          
           <h2 style="margin:0px;margin-top: 0px;font-weight:bold;">{{ currentTime}}</h2>
@@ -171,6 +172,7 @@ export default {
       isStudent : this.$store.getters.getIsStudent,
       isInstructor : this.$store.getters.getIsInstructor,
       hasClass : false,
+      stillLoading : true,
     };
   },
   setup() {
@@ -271,6 +273,8 @@ export default {
   },
 
   getRole(){
+      this.stillLoading = true;
+
       var token = this.$store.getters.getToken;
       
       const requestOptions = {
@@ -349,11 +353,14 @@ export default {
 
           this.userName = this.$store.getters.getUserName;
 
+          this.stillLoading = false;
+
         })
         .catch(error => {
           this.errorMessage = error;
           console.error('There was an error!', error);
           //this.$router.push('/login');
+          this.stillLoading = false;
         });
   },
   
@@ -385,11 +392,13 @@ export default {
           if(this.instructorClasses.length > 0) {this.hasClass = true;}
           else {this.hasClass = false;}
            this.userName = this.$store.getters.getUserName;
+           this.stillLoading = false;
         })
         .catch(error => {
           this.errorMessage = error;
           console.error('There was an error!', error);
           //this.$router.push('/login');
+          this.stillLoading = false;
         });
   },
 

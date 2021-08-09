@@ -7,6 +7,7 @@
       <ion-row>
         <ion-col size="12" style="text-align: center">
           <!--<h4>Faculty Acceptance</h4>-->
+          <ion-spinner color="primary" v-if="stillLoading == true"></ion-spinner>
           <h2 style="margin:0px;font-weight:bold;">{{ ClassTitle }} ({{ classID }})</h2>
           <h4 style="margin:0px;margin-top: 10px;">{{ currentDate }}</h4>
           <h4 style="margin:0px;margin-top: 10px;">{{classStartTime}} - {{classEndTime}}</h4>
@@ -106,6 +107,7 @@ export default {
             classStartTime: "",
             classEndTime: "",
             cuInsClass: {},
+            stillLoading: true,
         }
     },
     methods:{
@@ -167,6 +169,7 @@ export default {
             ).classEndTime;
             */
             //var token = this.$store.getters.getToken;
+            this.stillLoading = true;
             console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
             this.classIDLong = this.$route.params.id;
             this.cuInsClass = this.$store.getters.cuInsClass(this.$route.params.id);
@@ -200,12 +203,14 @@ export default {
                         this.classEndTime = this.changeTimeTo12(this.cuInsClass.endDateTime);
                         this.studentList = this.cleanupStudentData(data);
                         this.$store.commit("addStudentList",data.students);
+                        this.stillLoading = false;
                     }
                 })
                 .catch(error => {
                 this.errorMessage = error;
                 console.error('There was an error!', error);
                 this.openToastFailed();
+                this.stillLoading = false;
                 }); 
         },
 

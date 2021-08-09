@@ -22,7 +22,7 @@
             <ion-icon slot="end" :icon="refreshOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-buttons slot="end" v-if="pageDefaultBackLink == 'classList'">
+        <ion-buttons slot="end" v-if="pageDefaultBackLink == 'classList' && pageTitle != 'Student Attendance'">
           <ion-button id="changeText" @click="reloadStident()">
             <ion-icon slot="end" :icon="refreshOutline"></ion-icon>
           </ion-button>
