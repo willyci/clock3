@@ -168,8 +168,8 @@ export default {
       lastName:"",
       userRole: "",
       userID: "",
-      isStudent : true,
-      isInstructor : false,
+      isStudent : this.$store.getters.getIsStudent,
+      isInstructor : this.$store.getters.getIsInstructor,
       hasClass : false,
     };
   },
@@ -474,8 +474,12 @@ export default {
   watch:{
      $route (to,from){
         if(to.name == "classList") {
-          if(this.isStudent) {this.getStudentClasses();}
-          if(this.isInstructor) {this.getInstructorClasses();}
+          //console.log("in watch, isStudent="+this.isStudent +", isInstructor="+this.isInstructor);
+          //if(this.isStudent) {this.getStudentClasses();}
+          //else if(this.isInstructor) {this.getInstructorClasses();}
+          //else {
+            this.getRole();
+          //}
         }
         console.log("classlistpage"+to+from);
     }

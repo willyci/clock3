@@ -88,6 +88,9 @@ export default {
     },
     logout() {
       this.$store.commit("addToken","");
+      this.$store.commit("addStudent", false);
+      this.$store.commit("addInstructor", false);
+
       //this.$store.commit("addSchool",this.school);
       console.log("delete token -"+this.$store.getters.getToken+"-.");
       this.router.push('/login')

@@ -339,7 +339,7 @@ const store = createStore({
             token: '',
             school: '',
             isInstructor: false,
-            isStudent: true
+            isStudent: false
         };
     },
     mutations: {
