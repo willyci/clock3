@@ -18,7 +18,7 @@
     </ion-grid>
 
 <!-------------------------------------->
-<!--
+<!-- 
 <ion-grid v-if="isStudent == true">
   <ion-row
     v-for="cuClass in classes"
@@ -58,22 +58,38 @@
   
   <div v-for="cuClass in studentClasses"
       :key="cuClass.id">
-
-    <ion-row style="background:white;color:black;margin:15px 10px;"   v-if="cuClass.courseNumber == undefined "   
+    <!-- lunch  -->
+    <ion-row style="background:#a2a2a2;margin:15px 10px;"   v-if="cuClass.courseNumber == undefined "   
       class="course-block"
     >
           <ion-text style="margin: 0px 5px 5px 5px;">          
             <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
-            <span>{{ cuClass.title }} </span>  
+            <span>{{ cuClass.title }}</span>  
           </ion-text>        
     </ion-row>
     
+    <!-- activeForClockInOut != Y, disable class -->
     <ion-row style="background:#727272;margin:15px 10px;"   v-if="cuClass.activeForClockInOut!='Y' && cuClass.courseNumber != undefined "   
       class="course-block"
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
     >
+          
+          <ion-col size="6" style="float: left;font-size:12px;">
+              {{ changeTimeTo12(cuClass.start) }}
+            </ion-col>
+            <ion-col size="6" style="float: right;font-size:12px;"> 
+              <span v-if="cuClass.clockHistory.length>0 && cuClass.isAbsent != 'Y'" style="float: right;font-size:12px;">
+              <span>{{changeTimeTo12((cuClass.clockHistory)[cuClass.clockHistory.length-1].studentClockInDateTime)}} - </span>
+              <span>{{changeTimeTo12((cuClass.clockHistory)[cuClass.clockHistory.length-1].studentClockOutDateTime)}}</span>
+              </span>
+              <span v-if="cuClass.isAbsent == 'Y'" style="float: right;font-size:12px;color:#f67d7d;">
+              Absent  
+              </span>
+
+            </ion-col>
+            
           <ion-text style="margin: 0px 5px 5px 5px;">          
-            <span style="font-size:12px;">{{ changeTimeTo12(cuClass.start) }}</span><br/>
+            
             <span>{{ cuClass.title }} </span>  
             <span> ( {{ cuClass.courseNumber }} )</span>
           </ion-text>        
@@ -81,6 +97,7 @@
     <!--
     <ion-row style="background:#517FC8;margin:15px 10px;"   v-if="cuClass.activeForClockInOut=='Y'"   
     -->
+    <!-- activeForClockInOut == Y , enable class -->
     <ion-row style="background:#517FC8;margin:15px 10px;"  v-if="cuClass.activeForClockInOut=='Y' && cuClass.courseNumber != undefined " 
       class="course-block"
       @click="router.push(`/submitTime/${cuClass.courseNumber}`)"
@@ -90,10 +107,14 @@
               {{ changeTimeTo12(cuClass.start) }}
             </ion-col>
             <ion-col size="6" style="float: right;font-size:12px;"> 
-              <span v-if="cuClass.clockHistory.length>0" style="float: right;font-size:12px;">
+              <span v-if="cuClass.clockHistory.length>0 && cuClass.isAbsent != 'Y'" style="float: right;font-size:12px;">
               <span>{{changeTimeTo12((cuClass.clockHistory)[cuClass.clockHistory.length-1].studentClockInDateTime)}} - </span>
               <span>{{changeTimeTo12((cuClass.clockHistory)[cuClass.clockHistory.length-1].studentClockOutDateTime)}}</span>
               </span>
+              <span v-if="cuClass.isAbsent == 'Y'" style="float: right;font-size:12px;color:#f67d7d;">
+              Absent  
+              </span>
+
             </ion-col>
 
           <ion-text style="margin: 0px 5px 5px 5px;">
@@ -343,8 +364,8 @@ export default {
           console.log("classes = " + JSON.stringify(data));
           //console.log("classes = " + JSON.stringify(data.classes[0].startDateTime));
           this.studentClasses =[];
-          this.studentClasses = data.events;
-          //console.log("new classes = " + JSON.stringify(this.studentClasses));
+          this.studentClasses = this.cleanupStudentClassListData(data.events);
+          console.log("new classes = " + JSON.stringify(this.studentClasses));
           this.$store.commit("addClasses", this.studentClasses);
 
           //console.log("class count = "+ this.studentClasses.length);
@@ -432,10 +453,42 @@ export default {
         }
     },
 
+    // cleanup student  class list data, fill place holder with ""
+    cleanupStudentClassListData(list){
+      if(list.length>0){
+          for(var i =0; i < list.length; i++){
+            if( list[i].clockHistory!= undefined && list[i].clockHistory.length >0){
+              list[i]["isAbsent"] = ""; // add isAbsent flag 
+              for(var j =0; j < list[i].clockHistory.length; j++){ 
+                if(list[i].clockHistory[j].isAbsent != undefined && list[i].clockHistory[j].isAbsent =="Y") {
+                  list[i]["isAbsent"] = "Y"; // set isAbsent to true if there is one in array
+                }
+                
+                // build empty student in and out time holder
+                if(list[i].clockHistory[j].studentClockInDateTime == undefined ){
+                  list[i].clockHistory[j]["studentClockInDateTime"] = "";
+                }
+                if(list[i].clockHistory[j].studentClockOutDateTime == undefined){
+                  list[i].clockHistory[j]["studentClockOutDateTime"] = "";
+                }
 
-    //gotoPage(p) {
-      //if (p==1) {router.push('/login');}
-    //},
+                //copy instructor time into student time
+                if(list[i].clockHistory[j].instructorClockInDateTime != undefined && list[i].clockHistory[j].instructorClockInDateTime != ""){
+                  list[i].clockHistory[j].studentClockInDateTime = list[i].clockHistory[j].instructorClockInDateTime;
+                } else {
+                  list[i].clockHistory[j]["instructorClockInDateTime"] = "";
+                }
+                if(list[i].clockHistory[j].instructorClockOutDateTime != undefined && list[i].clockHistory[j].instructorClockOutDateTime != ""){
+                  list[i].clockHistory[j].studentClockOutDateTime = list[i].clockHistory[j].instructorClockOutDateTime;
+                } else {
+                  list[i].clockHistory[j]["instructorClockOutDateTime"] = "";
+                }
+              }
+            }
+          } 
+        }
+        return list;
+    },
   },
   mounted: function () {
     // check user token

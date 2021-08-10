@@ -155,9 +155,20 @@ export default {
         // if has studentClockOutDateTime, new in time
         // else it is out time, add clock id on submit
         //var lastTimeStemp = ch[ch.lenght-1]; 
-        if(ch[ch.length-1].studentClockOutDateTime != null) { this.InOutFlag = true; this.submitClockId="clockIn?";} 
-        else { this.InOutFlag = false; this.clockId = ch[ch.length-1].clockId; this.submitClockId= "clockOut?clockId="+this.clockId+"&";}
+        if (ch[ch.length-1].studentClockInDateTime != "" && ch[ch.length-1].studentClockOutDateTime == "" && ch[ch.length-1].clockId != "" ) {
+          // got id and in time, no out time, this is out time 
+          this.InOutFlag = false; this.clockId = ch[ch.length-1].clockId; this.submitClockId= "clockOut?clockId="+this.clockId+"&";
+        } 
+        else if (ch[ch.length-1].studentClockInDateTime == "" && ch[ch.length-1].studentClockOutDateTime == "" && ch[ch.length-1].clockId != ""){
+          // got it, both empty, this is in time
+          this.InOutFlag = true; this.clockId = ch[ch.length-1].clockId; this.submitClockId= "clockOut?clockId="+this.clockId+"&";
+        } else {
+          // else new in time
+          this.InOutFlag = true; this.submitClockId="clockIn?";
         }
+        //if(ch[ch.length-1].studentClockInDateTime != "" && ch[ch.length-1].studentClockOutDateTime == "" ) { this.InOutFlag = true; this.submitClockId="clockIn?";} 
+        //else { this.InOutFlag = false; this.clockId = ch[ch.length-1].clockId; this.submitClockId= "clockOut?clockId="+this.clockId+"&";}
+      }
 
 
      console.log("id="+this.$route.params.id);
