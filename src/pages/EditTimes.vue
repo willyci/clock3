@@ -107,9 +107,10 @@
         </ion-row>
     </ion-grid>
     
+    <!--
     <ion-grid>
         <ion-row>
-            <!--
+            
             <ion-col size="6">
                 <ion-button  @click="submitDelAbsent()" style="--background:#54595f;" expand="full">
                     <ion-icon  slot="start" :icon="addCircleOutline"></ion-icon>Not Absent</ion-button>
@@ -128,10 +129,10 @@
             <ion-checkbox
                 slot="start" color="danger" v-model="checkIsAbsent"
                 @ionChange="markAbsent($event)">             
-            </ion-checkbox></ion-item>-->
+            </ion-checkbox></ion-item>
         </ion-row>
     </ion-grid> 
-
+    -->
     
     <!--------->
     <ion-grid v-if="anythingChanged==true">

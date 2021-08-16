@@ -21,14 +21,14 @@
     <ion-list>
         <ion-item 
             v-for="student in studentList" 
-            :key="student.studentID" style="margin-right:20px;"
+            :key="student.studentID" style="margin-right:0px;"
             ><ion-grid>
             <ion-row ion-no-padding>
                 <ion-col size="2"><div><ion-img
             src="../../assets/default-avatar.png"
             
           ></ion-img></div></ion-col>
-                <ion-col size="10">
+                <ion-col size="8">
                     <div><span style="font-weight:bold;">{{student.firstName}} {{student.lastName}} </span></div>
                     <ion-row style="align-content: flex-start;" 
                     @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
@@ -54,6 +54,11 @@
                         <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
                     </ion-row>
                     -->
+                </ion-col>
+                <ion-col size="2" v-if="quickAbsentToggle == true">
+                    <div>
+                        <ion-toggle slot="start" :checked="student.isAbsent != 'Y'" @click="this.markAbsent($event,student.studentId)"></ion-toggle>
+                        </div>
                 </ion-col>
             </ion-row>    
         </ion-grid>
@@ -108,6 +113,7 @@ export default {
             classEndTime: "",
             cuInsClass: {},
             stillLoading: true,
+            quickAbsentToggle: false,
         }
     },
     methods:{
@@ -197,6 +203,8 @@ export default {
                         console.log("studnet list = "+JSON.stringify(data));
                         console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
 
+                        this.quickAbsentToggle = true;
+                        
                         this.ClassTitle = this.cuInsClass.title;
                         this.classID = this.cuInsClass.courseNumber;
                         this.classStartTime = this.changeTimeTo12(this.cuInsClass.startDateTime);
@@ -204,6 +212,7 @@ export default {
                         this.studentList = this.cleanupStudentData(data);
                         this.$store.commit("addStudentList",data.students);
                         this.stillLoading = false;
+                        
                     }
                 })
                 .catch(error => {
@@ -342,14 +351,124 @@ export default {
                                     //console.log("j="+j);   
                             }
                             //console.log("i="+i);
-                        } else {
+                        } else if (this.quickAbsentToggle == true) {
                             //console.log("no clock found")
+                            var newClockHistory = {};
+                            newClockHistory = {
+                                "studentClockInDateTime": this.cuInsClass.startDateTime,
+                                "studentClockOutDateTime": this.cuInsClass.endDateTime,
+                                "instructorClockInDateTime": this.cuInsClass.startDateTime,
+                                "instructorClockOutDateTime": this.cuInsClass.endDateTime,
+                            }
+                            cuClass.students[i].clockHistory.push(newClockHistory);
+                            cuClass.students[i].isAbsent = "";
                         }                   
                     }
                 } else { console.log('no students found'); }
                 console.log("student list after cleanup" + JSON.stringify(cuClass.students));
                 return cuClass.students;
             },
+
+            markAbsent(event,id) {
+                console.log("student id =" + id);
+                console.log("checked =" + event.currentTarget.checked);
+                if(event.currentTarget.checked){
+                    // mark absent
+                    this.submitAddAbsent(id);
+                } else {
+                    // remove absent
+                    this.submitDelAbsent(id);
+                }
+            },
+
+        submitAddAbsent(id){
+            // POST  /cafeweb/api/instructor/studentAbsent
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay() +
+                "&studentId=" + id
+                , requestOptions)
+                .then(async response => {
+                //const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    //const error = (data && data.message) || response.status;
+                    this.errorCount++;
+                    this.errorAbsent = true;
+                    return Promise.reject(response.status);
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                    console.log("mark absent Y");
+                    this.errorAbsent = false;
+                    this.getStudents();
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.errorCount++;
+                    this.errorAbsent = true;
+                });
+        },
+
+        // Absent flag is stored in clock hour record with no instructor or student clock in/out hours.
+        // remove absent flag to "N"
+        submitDelAbsent(id) {
+            // DELETE  /cafeweb/api/instructor/studentAbsent
+            var myToken = this.$store.getters.getToken;
+            console.log("token is "+myToken);
+            const requestOptions = {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 
+                           'Authorization': 'Bearer '+ this.$store.getters.getToken}
+            };
+            
+            var clockId = this.studentList.find((s)=>s.studentId == id).clockHistory[0].clockId;
+
+            fetch('https://qa2-web.scansoftware.com/cafeweb/api/instructor/studentAbsent?'+
+                "semester=" + this.cuInsClass.semester + 
+                "&courseNumber=" + this.cuInsClass.courseNumber +
+                "&courseSection=" + this.cuInsClass.courseSection +
+                "&labSection=" + this.cuInsClass.labSection +
+                "&date=" + this.getTodayDay() +
+                "&studentId=" + id + 
+                "&clockId=" + clockId
+                , requestOptions)
+                .then(async response => {
+                //const data = await response.json();
+
+                // check for error response
+                if (!response.ok) {
+                    // get error message from body or default to response status
+                    //const error = (data && data.message) || response.status;
+                    this.errorCount++;
+                    this.errorAbsent = true;
+                    return Promise.reject(response.status);
+                }
+                //console.log("ins classes = " + JSON.stringify(data.classes));
+                    console.log("mark absent N");
+                    this.errorAbsent = false;
+                    this.getStudents();
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                    this.errorCount++;
+                    this.errorAbsent = true;
+                });
+        },
+
     },
     mounted: function () {
       //update table display onload
