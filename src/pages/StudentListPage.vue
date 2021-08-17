@@ -203,7 +203,7 @@ export default {
                         console.log("studnet list = "+JSON.stringify(data));
                         console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
 
-                        this.quickAbsentToggle = true;
+                        this.quickAbsentToggle = false;
                         
                         this.ClassTitle = this.cuInsClass.title;
                         this.classID = this.cuInsClass.courseNumber;

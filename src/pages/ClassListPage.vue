@@ -136,12 +136,17 @@
     class="course-block"
     @click="router.push(`/studentList/${cuInsClass.semester +'-'+ cuInsClass.courseNumber +'-'+ cuInsClass.courseSection +'-'+cuInsClass.labSection}`)"
   >
+  <ion-col size="11">
         <ion-text style="margin: 5px 0px;">          
           <span style="font-size:12px;">{{ changeTimeTo12(cuInsClass.startDateTime) }}</span><br/>
           <span>{{ cuInsClass.title }}</span> 
-          <span> ( {{ cuInsClass.courseNumber }} )</span>
+          <span> ( {{ cuInsClass.courseNumber }} )</span>          
         </ion-text>
-      
+  </ion-col>
+  <ion-col size="1">
+    <span v-if="cuInsClass.hasIncompleteAttendance != true">
+    <ion-icon  :icon="checkmarkCircleOutline" style="font-size:25px;padding-top: 3px;"  ></ion-icon></span>
+  </ion-col>    
   </ion-row>
 </ion-grid> 
 <!-------------------------------------->
@@ -165,6 +170,7 @@ import {
   lockClosedOutline,
   refreshOutline,
   gitCompareOutline,
+  checkmarkCircleOutline,
 } from "ionicons/icons";
 import { useRouter } from "vue-router";
 
@@ -172,9 +178,11 @@ import { useRouter } from "vue-router";
 export default {
   components: {
     //IonIcon,
+    
   },
   data() {
     return {
+      checkmarkCircleOutline,
       classes: [],
       studentClasses: [],
       instructorClasses: [],
