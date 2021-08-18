@@ -18,20 +18,53 @@
 
 
 
-    <ion-list>
+    <ion-list style="padding-right:10px;">
         <ion-item 
             v-for="student in studentList" 
-            :key="student.studentID" style="margin-right:0px;"
-            ><ion-grid>
-            <ion-row ion-no-padding>
-                <ion-col size="2"><div><ion-img
-            src="../../assets/default-avatar.png"
+            :key="student.studentID" style="margin-right:0px;--padding-start: 10px;"
+            >
             
+            <!-- student.enrollmentStatus == 'graded' -->
+            <ion-grid v-if="student.enrollmentStatus == 'graded'" style="opacity: 0.5;">
+            <ion-row ion-no-padding >
+                <ion-col size="2"><div><ion-img
+            src="../../assets/default-avatar.png"            
+          ></ion-img></div></ion-col>
+                <ion-col size="10">
+                    <div><span style="color:grey">{{student.firstName}} {{student.lastName}} </span></div>
+                    <ion-row style="align-content: flex-start;"                     
+                     v-for="time in student.clockHistory" :key="time.studentID"
+                    >
+                            <ion-col size="5" v-if="student.clockHistory.length > 0">
+                                <div style="color:grey">{{this.changeTimeTo12(time.studentClockInDateTime)}}</div>
+                            </ion-col>
+                            <ion-col size="5" v-if="student.clockHistory.length > 0">
+                                <div style="color:grey">{{this.changeTimeTo12(time.studentClockOutDateTime)}}</div>
+                            </ion-col>
+                    </ion-row>
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 0 || student.isAbsent == 'Y'">
+                        <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
+                    </ion-row>
+                    <!--
+                    <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length >= 1 &&  student.clockHistory.isAbsent == 'Y'"
+                    @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
+                    >
+                        <ion-col size="12"><span style="color:red;">Absent</span></ion-col>
+                    </ion-row>
+                    -->
+                </ion-col>
+            </ion-row>    
+        </ion-grid>
+
+        <!-- student.enrollmentStatus not set -->
+        <ion-grid v-if="student.enrollmentStatus != 'graded'">
+            <ion-row ion-no-padding @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)">
+                <ion-col size="2"><div><ion-img
+            src="../../assets/default-avatar.png"            
           ></ion-img></div></ion-col>
                 <ion-col size="8">
-                    <div><span style="font-weight:bold;">{{student.firstName}} {{student.lastName}} </span></div>
-                    <ion-row style="align-content: flex-start;" 
-                    @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
+                    <div><span style="font-weight:bold;" >{{student.firstName}} {{student.lastName}} </span></div>
+                    <ion-row style="align-content: flex-start;"                     
                      v-for="time in student.clockHistory" :key="time.studentID"
                     >
                             <ion-col size="5" v-if="student.clockHistory.length > 0">
@@ -39,8 +72,7 @@
                             </ion-col>
                             <ion-col size="5" v-if="student.clockHistory.length > 0">
                                 <div>{{this.changeTimeTo12(time.studentClockOutDateTime)}}</div>
-                            </ion-col>
-                        
+                            </ion-col>                        
                     </ion-row>
                     <ion-row style="align-content: flex-start;" v-if="student.clockHistory.length == 0 || student.isAbsent == 'Y'"
                     @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)"
@@ -62,6 +94,7 @@
                 </ion-col>
             </ion-row>    
         </ion-grid>
+
              
         </ion-item> 
     </ion-list>
