@@ -57,7 +57,7 @@
         </ion-grid>
 
         <!-- student.enrollmentStatus not set -->
-        <ion-grid v-if="student.enrollmentStatus != 'graded'">
+        <ion-grid v-if="student.enrollmentStatus == undefined || student.enrollmentStatus == null ">
             <ion-row ion-no-padding @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)">
                 <ion-col size="2"><div><ion-img
             src="../../assets/default-avatar.png"            
