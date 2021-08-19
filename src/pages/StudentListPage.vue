@@ -87,7 +87,7 @@
                     </ion-row>
                     -->
                 </ion-col>
-                <ion-col size="2" v-if="quickAbsentToggle == true">
+                <ion-col size="2" v-if="absentIfNoTimeClockEntries == false">
                     <div>
                         <ion-toggle slot="start" :checked="student.isAbsent != 'Y'" @click="this.markAbsent($event,student.studentId)"></ion-toggle>
                         </div>
@@ -146,7 +146,7 @@ export default {
             classEndTime: "",
             cuInsClass: {},
             stillLoading: true,
-            quickAbsentToggle: false,
+            absentIfNoTimeClockEntries: false,
         }
     },
     methods:{
@@ -236,7 +236,7 @@ export default {
                         console.log("studnet list = "+JSON.stringify(data));
                         console.log("class info = "+JSON.stringify(this.$store.getters.cuInsClass(this.$route.params.id)));
 
-                        this.quickAbsentToggle = false;
+                        this.absentIfNoTimeClockEntries = data.absentIfNoTimeClockEntries;
                         
                         this.ClassTitle = this.cuInsClass.title;
                         this.classID = this.cuInsClass.courseNumber;
@@ -384,7 +384,7 @@ export default {
                                     //console.log("j="+j);   
                             }
                             //console.log("i="+i);
-                        } else if (this.quickAbsentToggle == true) {
+                        } else if (this.absentIfNoTimeClockEntries != true) {
                             //console.log("no clock found")
                             var newClockHistory = {};
                             newClockHistory = {
