@@ -58,11 +58,11 @@
 
         <!-- student.enrollmentStatus not set -->
         <ion-grid v-if="student.enrollmentStatus == undefined || student.enrollmentStatus == null ">
-            <ion-row ion-no-padding @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)">
+            <ion-row ion-no-padding >
                 <ion-col size="2"><div><ion-img
             src="../../assets/default-avatar.png"            
           ></ion-img></div></ion-col>
-                <ion-col size="8">
+                <ion-col size="8" @click="router.push(`/editTimes/${classIDLong}/${student.studentId}`)">
                     <div><span style="font-weight:bold;" >{{student.firstName}} {{student.lastName}} </span></div>
                     <ion-row style="align-content: flex-start;"                     
                      v-for="time in student.clockHistory" :key="time.studentID"
