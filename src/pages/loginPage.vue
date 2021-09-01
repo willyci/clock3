@@ -139,6 +139,12 @@ export default {
           this.errorMessage = error;
           console.error('There was an error!', error);
           this.loginError = true;
+
+          // push to next page no matter what
+          this.$router.push('/classList');
+
+          // goto new login page
+          //window.location.href = "https://qa2-web.scansoftware.com/cafeweb/mobile/";
         });
     },
 
