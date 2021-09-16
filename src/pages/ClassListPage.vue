@@ -392,57 +392,103 @@ export default {
       console.log("token saved to localstorage");
     },
 
-    // ask server for toekn, and save to localstorage
+    // check if got token,
+    // if got token,
+    // ask server for token, and save to localstorage
     // if has token, goto getRole()
     // if no token, goto /cafeweb/mobile/
-    getToken(){
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 
-                  'Authorization': 'Bearer token'},
-        //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
-        //body: JSON.stringify({"username":"instructor2","password":"instructor2"})
-        //body: JSON.stringify({"username":"student2","password":"student2"})
-        //body: JSON.stringify({"username":"student3","password":"student3"})
+    getToken() {
+      // get token from local storage
+      var token = localStorage.getItem("token");
 
-      };
-      fetch('/cafeweb/mobileApi/authenticate/token', requestOptions)
-        .then(async response => {
-          const data = await response.json();
+      // if has token, check using whoami api, if work run getRole, else to login page
+      if (token != null) {
+        console.log("getToken, token is not null - " + token);
+        const requestOptions1 = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        };
+        fetch("/cafeweb/mobileApi/authenticate/whoAmI", requestOptions1)
+          .then(async (response) => {
+            const data = await response.json();
+            // check for error response
+            if (!response.ok) {
+              // get error message from body or default to response status
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            // got token, try run get row
+            console.log("getToken, token good -" + token);
+            this.getRole();
+          })
+          .catch((error) => {
+            this.errorMessage = error;
+            console.error("There was an error! not login - ", error);
+            //this.$router.push("/login");
+            // failed get authenticate, kick to login
+            localStorage.removeItem("token");
+            window.location.href = "/cafeweb/mobile/";
+          });
+      }
+      // if no token, use token api get one, then call getRole, on error goto login
+      else {
+        console.log("getToken, token is null - " + token + ".");
+        const requestOptions = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer token",
+          },
+          //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})
+          //body: JSON.stringify({"username":"instructor2","password":"instructor2"})
+          //body: JSON.stringify({"username":"student2","password":"student2"})
+          //body: JSON.stringify({"username":"student3","password":"student3"})
+        };
+        fetch("/cafeweb/mobileApi/authenticate/token", requestOptions)
+          .then(async (response) => {
+            const data = await response.json();
 
-          // check for error response
-          if (!response.ok) {
-            // get error message from body or default to response status
-            const error = (data && data.message) || response.status;
-            return Promise.reject(error);
-          }
-          //console.log(data.token);
-          this.$store.commit("addToken",data.token);
-          //this.$store.commit("addSchool",this.school);
-          console.log("saved to state "+this.$store.getters.getToken);
-          //console.log('school = ' + this.$store.getters.getSchool);
-          this.createStorage();
-          //this.$router.push('/classList');
-          //this.postId = data.id;
-          //this.getClasses();
+            // check for error response
+            if (!response.ok) {
+              // get error message from body or default to response status
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            //console.log(data.token);
+            this.$store.commit("addToken", data.token);
+            //this.$store.commit("addSchool",this.school);
+            console.log("saved to state " + this.$store.getters.getToken);
+            //console.log('school = ' + this.$store.getters.getSchool);
+            //this.createStorage();
+            localStorage.setItem("token", data.token);
+            //this.$router.push('/classList');
+            //this.postId = data.id;
+            //this.getClasses();
 
-          // got token, try run get row
-          this.getRole();
-        })
-        .catch(error => {
-          this.errorMessage = error;
-          console.error('There was an error!', error);
-          this.loginError = true;
-          // failed get authenticate, kick to login
-          localStorage.removeItem("token");
-          window.location.href = "/cafeweb/mobile/";
-        });
+            // got token, try run get row
+            console.log("getToken, got token, run getRole - " + data.token);
+            this.getRole();
+          })
+          .catch((error) => {
+            this.errorMessage = error;
+            console.error("There was an error!", error);
+            this.loginError = true;
+            // failed get authenticate, kick to login
+            localStorage.removeItem("token");
+            window.location.href = "/cafeweb/mobile/";
+          });
+      }
     },
 
     getRole() {
       this.stillLoading = true;
 
-      var token = this.$store.getters.getToken;
+      //var token = this.$store.getters.getToken;
+      var token = localStorage.getItem("token");
+      console.log("getRole, got token - " + token);
 
       const requestOptions = {
         method: "GET",
@@ -451,10 +497,7 @@ export default {
           Authorization: "Bearer " + token,
         },
       };
-      fetch(
-        "/cafeweb/mobileApi/authenticate/whoAmI",
-        requestOptions
-      )
+      fetch("/cafeweb/mobileApi/authenticate/whoAmI", requestOptions)
         .then(async (response) => {
           const data = await response.json();
 
@@ -486,7 +529,7 @@ export default {
           }
 
           let stateObj = { id: "100" };
-          window.history.replaceState(stateObj,"Attendance", "/");
+          window.history.replaceState(stateObj, "Attendance", "/");
           //this.postId = data.id;
         })
         .catch((error) => {
@@ -501,7 +544,8 @@ export default {
 
     // build student's class list
     getStudentClasses() {
-      var myToken = this.$store.getters.getToken;
+      var myToken = localStorage.getItem("token");
+      console.log("getRole, got token - " + myToken);
 
       //if(myToken == null || myToken ==""){
       //// goto new login page
@@ -513,13 +557,10 @@ export default {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + this.$store.getters.getToken,
+          Authorization: "Bearer " + myToken,
         },
       };
-      fetch(
-        "/cafeweb/mobileApi/student/schedule?dateFilter=D",
-        requestOptions
-      )
+      fetch("/cafeweb/mobileApi/student/schedule?dateFilter=D", requestOptions)
         //fetch('/cafeweb/mobileApi/student/schedule', requestOptions)
         .then(async (response) => {
           const data = await response.json();
@@ -556,15 +597,14 @@ export default {
 
           // goto new login page
           localStorage.removeItem("token");
-          window.location.href =
-            "/cafeweb/mobile/";
+          window.location.href = "/cafeweb/mobile/";
         });
     },
 
     // asking token from server
     requestToken() {
       var myToken = this.$store.getters.getToken;
-      console.log("token is " + myToken+".");
+      console.log("token is " + myToken + ".");
       const requestOptions = {
         method: "POST",
         headers: {
@@ -572,39 +612,37 @@ export default {
           Authorization: "Bearer " + this.$store.getters.getToken,
         },
       };
-      fetch(
-        "/cafeweb/mobileApi/authenticate/token",
-        requestOptions
-      ).then(async (response) => {
+      fetch("/cafeweb/mobileApi/authenticate/token", requestOptions)
+        .then(async (response) => {
           const data = await response.json();
           console.log("token = " + JSON.stringify(data.token));
 
-          localStorage.setItem('token', data.token);
-          this.$store.commit("addToken",data.token);
+          localStorage.setItem("token", data.token);
+          this.$store.commit("addToken", data.token);
           console.log("write token to localStorage, and save to store");
-
-      }).catch((error) => {
+        })
+        .catch((error) => {
           this.errorMessage = error;
           console.error("There was an error!", error);
-      })
+        });
     },
-
 
     // build instructor's class list
     getInstructorClasses() {
       ///cafeweb/mobileApi/instructor/classes
-      var myToken = this.$store.getters.getToken;
+      //var myToken = this.$store.getters.getToken;
+      var myToken = localStorage.getItem("token");
       console.log("token is " + myToken);
+
       const requestOptions = {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + this.$store.getters.getToken,
+          Authorization: "Bearer " + myToken,
         },
       };
       fetch(
-        "/cafeweb/mobileApi/instructor/classes?date=" +
-          this.getTodayDay(),
+        "/cafeweb/mobileApi/instructor/classes?date=" + this.getTodayDay(),
         requestOptions
       )
         .then(async (response) => {
@@ -641,8 +679,7 @@ export default {
 
           localStorage.removeItem("token");
           // goto new login page
-          window.location.href =
-            "/cafeweb/mobile/";
+          window.location.href = "/cafeweb/mobile/";
         });
     },
 
