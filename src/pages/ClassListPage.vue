@@ -379,6 +379,66 @@ export default {
       this.getRole();
     },
 
+    // show token in console
+    loadToken() {
+      var token = localStorage.getItem("token");
+      console.log("token in localstorage " + token);
+    },
+
+    // save token to localstorage
+    createStorage() {
+      //var currStorage = window.localStorage;
+      localStorage.setItem("token", this.$store.getters.getToken);
+      console.log("token saved to localstorage");
+    },
+
+    // ask server for toekn, and save to localstorage
+    // if has token, goto getRole()
+    // if no token, goto /cafeweb/mobile/
+    getToken(){
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 
+                  'Authorization': 'Bearer token'},
+        //body: JSON.stringify({"username":this.userInfo.username,"password":this.userInfo.password})          
+        //body: JSON.stringify({"username":"instructor2","password":"instructor2"})
+        //body: JSON.stringify({"username":"student2","password":"student2"})
+        //body: JSON.stringify({"username":"student3","password":"student3"})
+
+      };
+      fetch('/cafeweb/mobileApi/authenticate/token', requestOptions)
+        .then(async response => {
+          const data = await response.json();
+
+          // check for error response
+          if (!response.ok) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          //console.log(data.token);
+          this.$store.commit("addToken",data.token);
+          //this.$store.commit("addSchool",this.school);
+          console.log("saved to state "+this.$store.getters.getToken);
+          //console.log('school = ' + this.$store.getters.getSchool);
+          this.createStorage();
+          //this.$router.push('/classList');
+          //this.postId = data.id;
+          //this.getClasses();
+
+          // got token, try run get row
+          this.getRole();
+        })
+        .catch(error => {
+          this.errorMessage = error;
+          console.error('There was an error!', error);
+          this.loginError = true;
+          // failed get authenticate, kick to login
+          localStorage.removeItem("token");
+          window.location.href = "/cafeweb/mobile/";
+        });
+    },
+
     getRole() {
       this.stillLoading = true;
 
@@ -392,7 +452,7 @@ export default {
         },
       };
       fetch(
-        "https://qa2-web.scansoftware.com/cafeweb/api/authenticate/whoAmI",
+        "/cafeweb/mobileApi/authenticate/whoAmI",
         requestOptions
       )
         .then(async (response) => {
@@ -425,12 +485,17 @@ export default {
             this.getInstructorClasses();
           }
 
+          let stateObj = { id: "100" };
+          window.history.replaceState(stateObj,"Attendance", "/");
           //this.postId = data.id;
         })
         .catch((error) => {
           this.errorMessage = error;
-          console.error("There was an error!", error);
-          this.$router.push("/login");
+          console.error("There was an error! not login - ", error);
+          //this.$router.push("/login");
+          // failed get authenticate, kick to login
+          localStorage.removeItem("token");
+          window.location.href = "/cafeweb/mobile/";
         });
     },
 
@@ -440,7 +505,7 @@ export default {
 
       //if(myToken == null || myToken ==""){
       //// goto new login page
-      //window.location.href = "https://qa2-web.scansoftware.com/cafeweb/mobile/";
+      //window.location.href = "/cafeweb/mobile/";
       //}
 
       console.log("token is " + myToken);
@@ -452,10 +517,10 @@ export default {
         },
       };
       fetch(
-        "https://qa2-web.scansoftware.com/cafeweb/api/student/schedule?dateFilter=D",
+        "/cafeweb/mobileApi/student/schedule?dateFilter=D",
         requestOptions
       )
-        //fetch('https://qa2-web.scansoftware.com/cafeweb/api/student/schedule', requestOptions)
+        //fetch('/cafeweb/mobileApi/student/schedule', requestOptions)
         .then(async (response) => {
           const data = await response.json();
 
@@ -490,13 +555,14 @@ export default {
           this.stillLoading = false;
 
           // goto new login page
+          localStorage.removeItem("token");
           window.location.href =
-            "https://qa2-web.scansoftware.com/cafeweb/mobile/";
+            "/cafeweb/mobile/";
         });
     },
 
-    // get token
-    getToken() {
+    // asking token from server
+    requestToken() {
       var myToken = this.$store.getters.getToken;
       console.log("token is " + myToken+".");
       const requestOptions = {
@@ -507,7 +573,7 @@ export default {
         },
       };
       fetch(
-        "https://qa2-web.scansoftware.com/cafeweb/api/authenticate/token",
+        "/cafeweb/mobileApi/authenticate/token",
         requestOptions
       ).then(async (response) => {
           const data = await response.json();
@@ -526,7 +592,7 @@ export default {
 
     // build instructor's class list
     getInstructorClasses() {
-      ///cafeweb/api/instructor/classes
+      ///cafeweb/mobileApi/instructor/classes
       var myToken = this.$store.getters.getToken;
       console.log("token is " + myToken);
       const requestOptions = {
@@ -537,7 +603,7 @@ export default {
         },
       };
       fetch(
-        "https://qa2-web.scansoftware.com/cafeweb/api/instructor/classes?date=" +
+        "/cafeweb/mobileApi/instructor/classes?date=" +
           this.getTodayDay(),
         requestOptions
       )
@@ -573,9 +639,10 @@ export default {
           //this.$router.push('/login');
           this.stillLoading = false;
 
+          localStorage.removeItem("token");
           // goto new login page
           window.location.href =
-            "https://qa2-web.scansoftware.com/cafeweb/mobile/";
+            "/cafeweb/mobile/";
         });
     },
 
@@ -678,7 +745,8 @@ export default {
     // if work getRole
     // else push to login
     // get role
-    this.getRole();
+    //this.getRole();
+    this.getToken();
 
     //update table display onload
     //this.getClass();
@@ -722,7 +790,7 @@ export default {
         //if(this.isStudent) {this.getStudentClasses();}
         //else if(this.isInstructor) {this.getInstructorClasses();}
         //else {
-        this.getRole();
+        this.getToken();
         //}
       }
       console.log("classlistpage" + to + from);
